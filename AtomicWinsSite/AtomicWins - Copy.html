@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Atomic Wins – Micro Achievements Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #0f172a;
+      --accent: #22c55e;
+      --accent-soft: #16a34a33;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --danger: #f97373;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2933, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 12px 40px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(to bottom right, #020617ee, #020617f9);
+      border-radius: 18px;
+      box-shadow:
+        0 22px 45px rgba(0,0,0,0.65),
+        0 0 0 1px rgba(148,163,184,0.15);
+      overflow: hidden;
+      border: 1px solid rgba(148,163,184,0.18);
+    }
+
+    .app-header {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+      background: radial-gradient(circle at top left, #22c55e26, transparent 55%);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .title-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.6);
+      color: var(--accent);
+      background: rgba(22,163,74,0.1);
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .date-chip {
+      font-size: 0.75rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--text-muted);
+      background: rgba(15,23,42,0.85);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-card {
+      flex: 1;
+      border-radius: 12px;
+      padding: 8px 9px;
+      background: radial-gradient(circle at top, #16a34a1f, #02061700 60%);
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .stat-suffix {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .stat-tag {
+      margin-top: 3px;
+      font-size: 0.7rem;
+      color: var(--accent);
+    }
+
+    .content {
+      padding: 10px 12px 16px;
+    }
+
+    .hint {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.85);
+      border: 1px dashed rgba(55,65,81,0.9);
+    }
+
+    .tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .task-card {
+      background: radial-gradient(circle at top left, #1e293b, #020617);
+      border-radius: 14px;
+      padding: 10px 11px;
+      border: 1px solid rgba(55,65,81,0.95);
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .task-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.35);
+      border-color: rgba(94,234,212,0.75);
+    }
+
+    .task-card.done {
+      border-color: rgba(34,197,94,0.95);
+      background: radial-gradient(circle at top left, #16a34a33, #020617);
+    }
+
+    .task-emoji {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .task-main {
+      flex: 1;
+    }
+
+    .task-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .task-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .task-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .task-tag {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: var(--text-muted);
+    }
+
+    .task-btn {
+      border: none;
+      outline: none;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      transition: background 0.12s ease, transform 0.08s ease, box-shadow 0.1s ease;
+      box-shadow: 0 2px 6px rgba(22,163,74,0.35);
+    }
+
+    .task-btn:hover {
+      background: rgba(22,163,74,0.35);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(22,163,74,0.45);
+    }
+
+    .task-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(22,163,74,0.35);
+    }
+
+    .task-btn.done {
+      background: rgba(22,163,74,0.12);
+      color: var(--text-main);
+      box-shadow: none;
+      cursor: default;
+    }
+
+    .task-btn.done::before {
+      content: "✓";
+      font-size: 0.75rem;
+    }
+
+    .footer {
+      padding: 8px 12px 12px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(31,41,55,0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+    }
+
+    .reset-btn {
+      background: none;
+      border: none;
+      color: rgba(248,113,113,0.9);
+      font-size: 0.7rem;
+      cursor: pointer;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+
+    .reset-btn:hover {
+      color: var(--danger);
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px 8px 18px;
+      }
+      .app {
+        border-radius: 16px;
+      }
+      .title {
+        font-size: 1.15rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="title-row">
+        <div>
+          <div class="title">
+            ⚡ Atomic Wins
+            <span class="title-badge">Micro Achievements</span>
+          </div>
+          <div class="subtitle" id="subtitleText">
+            Turn tiny actions into daily momentum.
+          </div>
+        </div>
+        <div class="date-chip" id="dateChip"></div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Streak</div>
+          <div class="stat-value">
+            <span id="streakValue">0</span>
+            <span class="stat-suffix">days</span>
+          </div>
+          <div class="stat-tag" id="streakTag">No streak yet. Start today.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Today</div>
+          <div class="stat-value">
+            <span id="todayWins">0</span>
+            <span class="stat-suffix">wins</span>
+          </div>
+          <div class="stat-tag" id="todayTag">Tap one tiny win to begin.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">All Time</div>
+          <div class="stat-value">
+            <span id="totalWins">0</span>
+            <span class="stat-suffix">wins</span>
+          </div>
+          <div class="stat-tag">Compounds quietly.</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="hint">
+        These are intentionally <strong>tiny</strong> — 10–60 seconds each.
+        Pick any one, do it quickly, tap <em>mark as done</em>. That’s a win.
+      </div>
+
+      <div class="tasks" id="tasksContainer"></div>
+    </main>
+
+    <footer class="footer">
+      <div class="pill">
+        Local only · Your data stays in this browser.
+      </div>
+      <button class="reset-btn" id="resetButton" title="Clear all stats and start over">
+        reset stats
+      </button>
+    </footer>
+  </div>
+
+  <script>
+    // ---------- CONFIG ----------
+    const TASKS = [
+      {
+        id: 'deep-breaths',
+        emoji: '🌬️',
+        title: 'Take 3 deep breaths',
+        description: 'Inhale slowly through your nose, exhale through your mouth.',
+        tag: '10 seconds'
+      },
+      {
+        id: 'water-sips',
+        emoji: '💧',
+        title: 'Drink a few sips of water',
+        description: 'Just enough to remind your body you care.',
+        tag: '15 seconds'
+      },
+      {
+        id: 'stand-stretch',
+        emoji: '🧍‍♂️',
+        title: 'Stand up & stretch',
+        description: 'Neck, shoulders, back. Shake out the stiffness.',
+        tag: '20 seconds'
+      },
+      {
+        id: 'one-thing',
+        emoji: '📝',
+        title: 'Write one tiny thing',
+        description: 'Jot down a thought, idea, or gratitude.',
+        tag: '30 seconds'
+      },
+      {
+        id: 'look-away',
+        emoji: '👀',
+        title: 'Look away from screens',
+        description: 'Gaze at something 20+ feet away to reset your eyes.',
+        tag: '20 seconds'
+      },
+      {
+        id: 'tidy-spot',
+        emoji: '🧹',
+        title: 'Tidy one small spot',
+        description: 'Desk corner, nightstand, or one shelf – only one.',
+        tag: '45 seconds'
+      }
+    ];
+
+    const STORAGE_KEY = 'atomicWins_v1';
+
+    // ---------- UTILITIES ----------
+    function getTodayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function getYesterdayKey() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function formatNiceDate(date = new Date()) {
+      return date.toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    // ---------- STORAGE ----------
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        return {
+          streak: 0,
+          lastActivityDate: null,
+          totalWins: 0,
+          completionsByDay: {} // { 'YYYY-MM-DD': ['taskId', ...] }
+        };
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        // Basic sanity defaults
+        return {
+          streak: parsed.streak || 0,
+          lastActivityDate: parsed.lastActivityDate || null,
+          totalWins: parsed.totalWins || 0,
+          completionsByDay: parsed.completionsByDay || {}
+        };
+      } catch {
+        return {
+          streak: 0,
+          lastActivityDate: null,
+          totalWins: 0,
+          completionsByDay: {}
+        };
+      }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // ---------- APP LOGIC ----------
+    let state = loadState();
+    const todayKey = getTodayKey();
+    const yesterdayKey = getYesterdayKey();
+
+    const dateChipEl = document.getElementById('dateChip');
+    const streakValueEl = document.getElementById('streakValue');
+    const todayWinsEl = document.getElementById('todayWins');
+    const totalWinsEl = document.getElementById('totalWins');
+    const streakTagEl = document.getElementById('streakTag');
+    const todayTagEl = document.getElementById('todayTag');
+    const tasksContainerEl = document.getElementById('tasksContainer');
+    const resetButtonEl = document.getElementById('resetButton');
+
+    function ensureTodayEntry() {
+      if (!state.completionsByDay[todayKey]) {
+        state.completionsByDay[todayKey] = [];
+      }
+    }
+
+    function isTaskDoneToday(taskId) {
+      const list = state.completionsByDay[todayKey] || [];
+      return list.includes(taskId);
+    }
+
+    function updateStatsUI() {
+      const todayList = state.completionsByDay[todayKey] || [];
+      const todayCount = todayList.length;
+
+      dateChipEl.textContent = formatNiceDate();
+      streakValueEl.textContent = state.streak;
+      todayWinsEl.textContent = todayCount;
+      totalWinsEl.textContent = state.totalWins;
+
+      if (state.streak === 0) {
+        streakTagEl.textContent = 'No streak yet. Start today.';
+      } else if (state.streak < 3) {
+        streakTagEl.textContent = 'Nice. You’re building the chain.';
+      } else if (state.streak < 7) {
+        streakTagEl.textContent = 'Solid run. Keep feeding it.';
+      } else {
+        streakTagEl.textContent = 'You’re on fire. Don’t break it.';
+      }
+
+      if (todayCount === 0) {
+        todayTagEl.textContent = 'Tap one tiny win to begin.';
+      } else if (todayCount < 3) {
+        todayTagEl.textContent = 'Momentum unlocked. Keep going if you like.';
+      } else {
+        todayTagEl.textContent = 'You’ve already done plenty. Extra is bonus.';
+      }
+    }
+
+    function renderTasks() {
+      tasksContainerEl.innerHTML = '';
+      TASKS.forEach(task => {
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        if (isTaskDoneToday(task.id)) {
+          card.classList.add('done');
+        }
+
+        const emoji = document.createElement('div');
+        emoji.className = 'task-emoji';
+        emoji.textContent = task.emoji;
+
+        const main = document.createElement('div');
+        main.className = 'task-main';
+
+        const title = document.createElement('div');
+        title.className = 'task-title';
+        title.textContent = task.title;
+
+        const desc = document.createElement('div');
+        desc.className = 'task-desc';
+        desc.textContent = task.description;
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'task-meta-row';
+
+        const tag = document.createElement('div');
+        tag.className = 'task-tag';
+        tag.textContent = task.tag;
+
+        const btn = document.createElement('button');
+        btn.className = 'task-btn';
+        btn.textContent = 'Mark as done';
+
+        if (isTaskDoneToday(task.id)) {
+          btn.classList.add('done');
+          btn.textContent = 'Completed';
+        }
+
+        btn.addEventListener('click', () => {
+          if (isTaskDoneToday(task.id)) return;
+
+          ensureTodayEntry();
+          state.completionsByDay[todayKey].push(task.id);
+          state.totalWins += 1;
+
+          // Streak logic: only when first win of the day is recorded
+          const todayCountBefore = state.completionsByDay[todayKey].length - 1;
+          if (todayCountBefore === 0) {
+            if (state.lastActivityDate === yesterdayKey) {
+              state.streak += 1;
+            } else if (state.lastActivityDate === todayKey) {
+              // already counted, do nothing
+            } else {
+              state.streak = 1;
+            }
+            state.lastActivityDate = todayKey;
+          }
+
+          saveState(state);
+          updateStatsUI();
+          renderTasks();
+        });
+
+        metaRow.appendChild(tag);
+        metaRow.appendChild(btn);
+        main.appendChild(title);
+        main.appendChild(desc);
+        main.appendChild(metaRow);
+
+        card.appendChild(emoji);
+        card.appendChild(main);
+        tasksContainerEl.appendChild(card);
+      });
+    }
+
+    function attachResetHandler() {
+      resetButtonEl.addEventListener('click', () => {
+        const ok = confirm('Reset all Atomic Wins stats on this device? This cannot be undone.');
+        if (!ok) return;
+        state = {
+          streak: 0,
+          lastActivityDate: null,
+          totalWins: 0,
+          completionsByDay: {}
+        };
+        saveState(state);
+        updateStatsUI();
+        renderTasks();
+      });
+    }
+
+    // ---------- INIT ----------
+    (function init() {
+      ensureTodayEntry();
+      updateStatsUI();
+      renderTasks();
+      attachResetHandler();
+    })();
+  </script>
+</body>
+</html>

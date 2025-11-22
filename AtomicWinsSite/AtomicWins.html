@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Atomic Wins – Micro Achievements Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #0f172a;
+      --accent: #22c55e;
+      --accent-soft: #16a34a33;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --danger: #f97373;
+      --history-bg: #020617;
+      --history-bar: #4ade80;
+      --history-bar-faint: #1f2937;
+      --focus-border: rgba(250, 204, 21, 0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2933, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 12px 40px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      background: linear-gradient(to bottom right, #020617ee, #020617f9);
+      border-radius: 18px;
+      box-shadow:
+        0 22px 45px rgba(0,0,0,0.65),
+        0 0 0 1px rgba(148,163,184,0.15);
+      overflow: hidden;
+      border: 1px solid rgba(148,163,184,0.18);
+      position: relative;
+      z-index: 1;
+    }
+
+    .app-header {
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+      background: radial-gradient(circle at top left, #22c55e26, transparent 55%);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .title-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.6);
+      color: var(--accent);
+      background: rgba(22,163,74,0.1);
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .date-chip-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .date-chip {
+      font-size: 0.75rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--text-muted);
+      background: rgba(15,23,42,0.85);
+      white-space: nowrap;
+    }
+
+    .track-chip {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--accent);
+      background: rgba(15,23,42,0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .track-chip span.emoji {
+      font-size: 0.9rem;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-card {
+      flex: 1;
+      border-radius: 12px;
+      padding: 8px 9px;
+      background: radial-gradient(circle at top, #16a34a1f, #02061700 60%);
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .stat-suffix {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .stat-tag {
+      margin-top: 3px;
+      font-size: 0.7rem;
+      color: var(--accent);
+    }
+
+    .feedback {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--accent);
+      background: rgba(34,197,94,0.08);
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(34,197,94,0.4);
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      min-height: 0;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .content {
+      padding: 10px 12px 16px;
+    }
+
+    .hint {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.85);
+      border: 1px dashed rgba(55,65,81,0.9);
+    }
+
+    /* Tracks selector */
+    .tracks-box {
+      margin-top: 6px;
+      margin-bottom: 10px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 14px;
+      padding: 8px 9px 7px;
+      border: 1px solid rgba(55,65,81,0.95);
+    }
+
+    .tracks-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .tracks-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .track-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: #020617;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      padding: 4px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .track-pill span.emoji {
+      font-size: 0.9rem;
+    }
+
+    .track-pill.active {
+      border-color: rgba(34,197,94,0.9);
+      background: rgba(22,163,74,0.18);
+      color: var(--accent);
+    }
+
+    .track-pill .track-name {
+      font-weight: 500;
+    }
+
+    .focus-section {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      background: rgba(24, 24, 27, 0.95);
+      border-radius: 14px;
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      padding: 8px 9px 8px;
+    }
+
+    .focus-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .focus-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .focus-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .focus-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .history {
+      margin-top: 8px;
+      margin-bottom: 10px;
+      background: var(--history-bg);
+      border-radius: 12px;
+      padding: 8px 9px 6px;
+      border: 1px solid rgba(31,41,55,0.9);
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 6px;
+    }
+
+    .history-title {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .history-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .history-item {
+      text-align: center;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .history-day {
+      margin-bottom: 2px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .history-bar {
+      width: 100%;
+      border-radius: 999px;
+      height: 12px;
+      background: var(--history-bar-faint);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .history-bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: var(--history-bar);
+      transition: width 0.15s ease;
+    }
+
+    .history-count {
+      margin-top: 1px;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .history-item.today .history-bar {
+      box-shadow: 0 0 0 1px rgba(74,222,128,0.8);
+    }
+
+    .history-item.today .history-day {
+      color: var(--accent);
+    }
+
+    .weekly-summary {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(55,65,81,0.8);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .weekly-summary span.highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .task-card {
+      background: radial-gradient(circle at top left, #1e293b, #020617);
+      border-radius: 14px;
+      padding: 10px 11px;
+      border: 1px solid rgba(55,65,81,0.95);
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .task-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.35);
+      border-color: rgba(94,234,212,0.75);
+    }
+
+    .task-card.done {
+      border-color: rgba(34,197,94,0.95);
+      background: radial-gradient(circle at top left, #16a34a33, #020617);
+    }
+
+    .task-card.focus-card {
+      border-color: var(--focus-border);
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.35), 0 10px 18px rgba(0,0,0,0.35);
+    }
+
+    .task-emoji {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .task-main {
+      flex: 1;
+    }
+
+    .task-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .task-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .task-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .task-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .task-tag {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: var(--text-muted);
+    }
+
+    .pin-btn {
+      font-size: 0.75rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(250, 204, 21, 0.7);
+      background: rgba(250, 204, 21, 0.05);
+      color: #facc15;
+      cursor: pointer;
+    }
+
+    .pin-btn.pinned {
+      background: rgba(250, 204, 21, 0.18);
+    }
+
+    .task-btn {
+      border: none;
+      outline: none;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      transition: background 0.12s ease, transform 0.08s ease, box-shadow 0.1s ease;
+      box-shadow: 0 2px 6px rgba(22,163,74,0.35);
+    }
+
+    .task-btn:hover {
+      background: rgba(22,163,74,0.35);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(22,163,74,0.45);
+    }
+
+    .task-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(22,163,74,0.35);
+    }
+
+    .task-btn.done {
+      background: rgba(22,163,74,0.12);
+      color: var(--text-main);
+      box-shadow: none;
+      cursor: default;
+    }
+
+    .task-btn.done::before {
+      content: "✓";
+      font-size: 0.75rem;
+    }
+
+    .custom-box {
+      margin-top: 12px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 14px;
+      padding: 9px 10px 10px;
+      border: 1px solid rgba(55,65,81,0.95);
+    }
+
+    .custom-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .custom-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .custom-input {
+      flex: 1;
+      min-width: 0;
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 6px 9px;
+      font-size: 0.78rem;
+      color: var(--text-main);
+    }
+
+    .custom-input::placeholder {
+      color: #6b7280;
+    }
+
+    .custom-add-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: rgba(37,99,235,0.15);
+      color: #60a5fa;
+      white-space: nowrap;
+      transition: background 0.12s ease, transform 0.08s ease;
+    }
+
+    .custom-add-btn:hover {
+      background: rgba(37,99,235,0.3);
+      transform: translateY(-1px);
+    }
+
+    .custom-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .reflection-box {
+      margin-top: 12px;
+      background: rgba(12, 18, 32, 0.98);
+      border-radius: 14px;
+      padding: 8px 10px 9px;
+      border: 1px solid rgba(55,65,81,0.95);
+    }
+
+    .reflection-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .reflection-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.78rem;
+      padding: 6px 8px;
+      resize: none;
+      min-height: 32px;
+    }
+
+    .reflection-input::placeholder {
+      color: #6b7280;
+    }
+
+    .reflection-hint {
+      margin-top: 3px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .settings-box {
+      margin-top: 12px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 14px;
+      padding: 8px 10px 9px;
+      border: 1px solid rgba(55,65,81,0.95);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .settings-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .settings-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .settings-label {
+      font-size: 0.76rem;
+    }
+
+    .settings-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .settings-checkbox {
+      accent-color: var(--accent);
+      width: 14px;
+      height: 14px;
+    }
+
+    .settings-select {
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      padding: 4px 8px;
+    }
+
+    .footer {
+      padding: 8px 12px 12px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(31,41,55,0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+    }
+
+    .reset-btn {
+      background: none;
+      border: none;
+      color: rgba(248,113,113,0.9);
+      font-size: 0.7rem;
+      cursor: pointer;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+
+    .reset-btn:hover {
+      color: var(--danger);
+    }
+
+    /* Onboarding overlay */
+    .onboarding-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.96), rgba(2,6,23,0.98));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .onboarding-card {
+      width: 100%;
+      max-width: 380px;
+      margin: 16px;
+      background: #020617;
+      border-radius: 20px;
+      border: 1px solid rgba(148,163,184,0.3);
+      box-shadow: 0 24px 50px rgba(0,0,0,0.8);
+      padding: 16px 16px 14px;
+    }
+
+    .onboarding-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .onboarding-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .onboarding-body {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .onboarding-list {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .onboarding-list li {
+      margin-left: 16px;
+      margin-bottom: 4px;
+    }
+
+    .onboarding-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .onboarding-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .onboarding-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(75,85,99,0.9);
+    }
+
+    .onboarding-dot.active {
+      width: 14px;
+      background: var(--accent);
+    }
+
+    .onboarding-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+      box-shadow: 0 10px 24px rgba(34,197,94,0.4);
+    }
+
+    .onboarding-skip {
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      cursor: pointer;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px 8px 18px;
+      }
+      .app {
+        border-radius: 16px;
+      }
+      .title {
+        font-size: 1.15rem;
+      }
+      .stats-row {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Onboarding overlay -->
+  <div class="onboarding-overlay" id="onboardingOverlay" style="display:none;">
+    <div class="onboarding-card">
+      <div class="onboarding-tag">Welcome to Atomic Wins</div>
+      <div class="onboarding-title" id="onboardingTitle"></div>
+      <div class="onboarding-body" id="onboardingBody"></div>
+      <ul class="onboarding-list" id="onboardingList"></ul>
+      <div class="onboarding-footer">
+        <button class="onboarding-skip" id="onboardingSkip">Skip</button>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="onboarding-dots">
+            <div class="onboarding-dot" data-step="0"></div>
+            <div class="onboarding-dot" data-step="1"></div>
+            <div class="onboarding-dot" data-step="2"></div>
+          </div>
+          <button class="onboarding-btn" id="onboardingNext">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <header class="app-header">
+      <div class="title-row">
+        <div>
+          <div class="title">
+            ⚡ Atomic Wins
+            <span class="title-badge">Micro Achievements</span>
+          </div>
+          <div class="subtitle" id="subtitleText">
+            Turn tiny actions into daily momentum.
+          </div>
+        </div>
+        <div class="date-chip-wrap">
+          <div class="date-chip" id="dateChip"></div>
+          <div class="track-chip" id="trackChip">
+            <span class="emoji">⚡</span><span id="trackChipLabel">General Momentum</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Streak</div>
+          <div class="stat-value">
+            <span id="streakValue">0</span>
+            <span class="stat-suffix">days</span>
+          </div>
+          <div class="stat-tag" id="streakTag">No streak yet. Start today.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Today</div>
+          <div class="stat-value">
+            <span id="todayWins">0</span>
+            <span class="stat-suffix">wins</span>
+          </div>
+          <div class="stat-tag" id="todayTag">Tap one tiny win to begin.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">All Time</div>
+          <div class="stat-value">
+            <span id="totalWins">0</span>
+            <span class="stat-suffix">wins</span>
+          </div>
+          <div class="stat-tag">Compounds quietly.</div>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedbackMessage"></div>
+    </header>
+
+    <main class="content">
+      <div class="hint">
+        These are intentionally <strong>tiny</strong> — 10–60 seconds each.
+        Pick any one, do it quickly, tap <em>mark as done</em>. That’s a win.
+      </div>
+
+      <!-- Track selector -->
+      <section class="tracks-box">
+        <div class="tracks-title">Choose your track</div>
+        <div class="tracks-list" id="tracksList"></div>
+      </section>
+
+      <!-- Focus / pinned tasks -->
+      <section class="focus-section" id="focusSection" style="display:none;">
+        <div class="focus-header">
+          <div class="focus-title">
+            ⭐ Focus quests
+          </div>
+          <div class="focus-subtitle">
+            Your starred tiny wins for today.
+          </div>
+        </div>
+        <div class="focus-list" id="focusContainer"></div>
+      </section>
+
+      <!-- History: last 7 days -->
+      <section class="history" id="historySection">
+        <div class="history-header">
+          <div class="history-title">Last 7 days</div>
+          <div class="history-subtitle" id="historySubtitle"></div>
+        </div>
+        <div class="history-grid" id="historyGrid"></div>
+        <div class="weekly-summary" id="weeklySummary"></div>
+      </section>
+
+      <section class="tasks" id="tasksContainer"></section>
+
+      <!-- Custom task creator -->
+      <section class="custom-box">
+        <div class="custom-title">Add your own tiny win</div>
+        <div class="custom-row">
+          <div class="input-row">
+            <input
+              id="customTitleInput"
+              class="custom-input"
+              type="text"
+              maxlength="60"
+              placeholder="e.g. Send 1 kind message"
+            />
+            <input
+              id="customTagInput"
+              class="custom-input"
+              type="text"
+              maxlength="24"
+              placeholder="e.g. 30 seconds"
+            />
+            <button id="customAddBtn" class="custom-add-btn">Add</button>
+          </div>
+          <div class="custom-hint">
+            Custom quests are saved per track. Keep them small and repeatable.
+          </div>
+        </div>
+      </section>
+
+      <!-- Reflection -->
+      <section class="reflection-box">
+        <div class="reflection-title">After today’s wins, I feel…</div>
+        <textarea
+          id="reflectionInput"
+          class="reflection-input"
+          maxlength="120"
+          placeholder="e.g. a little calmer · less stuck · more in control"
+        ></textarea>
+        <div class="reflection-hint">
+          Just a word or short phrase. This shows up in your weekly summary.
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="settings-box">
+        <div class="settings-title">
+          ⚙️ Player settings
+        </div>
+        <div class="settings-row">
+          <div class="settings-item">
+            <div class="settings-label">
+              Streak forgiveness
+              <div style="font-size:0.68rem;color:var(--text-muted);">
+                Missing 1 day softens your streak instead of killing it.
+              </div>
+            </div>
+            <div class="settings-control">
+              <input type="checkbox" id="settingForgiveness" class="settings-checkbox" />
+              <label for="settingForgiveness" style="font-size:0.74rem;">On</label>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-label">
+              Max focus quests
+              <div style="font-size:0.68rem;color:var(--text-muted);">
+                How many ⭐ cards you can pin at once.
+              </div>
+            </div>
+            <div class="settings-control">
+              <select id="settingMaxPinned" class="settings-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3 (default)</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-label">
+              Tone of feedback
+              <div style="font-size:0.68rem;color:var(--text-muted);">
+                Choose how the app talks to you.
+              </div>
+            </div>
+            <div class="settings-control">
+              <select id="settingTone" class="settings-select">
+                <option value="encouraging">Encouraging</option>
+                <option value="gentle">Gentle</option>
+                <option value="hype">Hype</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="pill">
+        Local only · Your data stays in this browser.
+      </div>
+      <button class="reset-btn" id="resetButton" title="Clear all stats and tasks and start over">
+        reset all
+      </button>
+    </footer>
+  </div>
+
+  <script>
+    // ---------- TRACKS & DEFAULT TASKS ----------
+    const TRACKS = [
+      {
+        id: 'general',
+        name: 'General',
+        label: 'General Momentum',
+        emoji: '⚡',
+        description: 'A bit of everything.',
+        tasks: [
+          {
+            id: 'gen-deep-breaths',
+            emoji: '🌬️',
+            title: 'Take 3 deep breaths',
+            description: 'Inhale slowly through your nose, exhale through your mouth.',
+            tag: '10 seconds'
+          },
+          {
+            id: 'gen-water-sips',
+            emoji: '💧',
+            title: 'Drink a few sips of water',
+            description: 'Just enough to remind your body you care.',
+            tag: '15 seconds'
+          },
+          {
+            id: 'gen-stand-stretch',
+            emoji: '🧍‍♂️',
+            title: 'Stand up & stretch',
+            description: 'Neck, shoulders, back. Shake out the stiffness.',
+            tag: '20 seconds'
+          },
+          {
+            id: 'gen-one-thing',
+            emoji: '📝',
+            title: 'Write one tiny thing',
+            description: 'Jot down a thought, idea, or gratitude.',
+            tag: '30 seconds'
+          },
+          {
+            id: 'gen-look-away',
+            emoji: '👀',
+            title: 'Look away from screens',
+            description: 'Gaze at something 20+ feet away to reset your eyes.',
+            tag: '20 seconds'
+          },
+          {
+            id: 'gen-tidy-spot',
+            emoji: '🧹',
+            title: 'Tidy one small spot',
+            description: 'Desk corner, nightstand, or one shelf – only one.',
+            tag: '45 seconds'
+          }
+        ]
+      },
+      {
+        id: 'calm',
+        name: 'Calm',
+        label: 'Calm Nervous System',
+        emoji: '🧘',
+        description: 'For anxious, overstimulated days.',
+        tasks: [
+          {
+            id: 'calm-box-breath',
+            emoji: '📦',
+            title: 'Do 4 box breaths',
+            description: 'Inhale 4, hold 4, exhale 4, hold 4.',
+            tag: '40 seconds'
+          },
+          {
+            id: 'calm-body-scan',
+            emoji: '🧠',
+            title: 'Mini body scan',
+            description: 'Notice your jaw, shoulders, belly, hands.',
+            tag: '45 seconds'
+          },
+          {
+            id: 'calm-sip-water',
+            emoji: '💧',
+            title: 'Sip water slowly',
+            description: 'Three slow sips, pay attention to the feeling.',
+            tag: '20 seconds'
+          },
+          {
+            id: 'calm-window',
+            emoji: '🌥️',
+            title: 'Look out a window',
+            description: 'Just watch the sky or anything not a screen.',
+            tag: '30 seconds'
+          },
+          {
+            id: 'calm-shoulders',
+            emoji: '💆‍♂️',
+            title: 'Unclench shoulders',
+            description: 'Roll them gently forward and back.',
+            tag: '25 seconds'
+          }
+        ]
+      },
+      {
+        id: 'focus',
+        name: 'Focus',
+        label: 'Laser Focus',
+        emoji: '🎯',
+        description: 'For scattered or ADHD-ish days.',
+        tasks: [
+          {
+            id: 'focus-single-task',
+            emoji: '🎯',
+            title: 'Choose one tiny task',
+            description: 'Decide the next thing you’ll do for 60 seconds.',
+            tag: '20 seconds'
+          },
+          {
+            id: 'focus-notifications',
+            emoji: '🔕',
+            title: 'Mute one distraction',
+            description: 'Silence a chat, close a tab, or pause notifications.',
+            tag: '25 seconds'
+          },
+          {
+            id: 'focus-timer',
+            emoji: '⏱️',
+            title: 'Set a 3-min timer',
+            description: 'Commit to 3 focused minutes on one thing.',
+            tag: '30 seconds'
+          },
+          {
+            id: 'focus-desk',
+            emoji: '🧹',
+            title: 'Clear 1 square foot',
+            description: 'Make a tiny “focus island” of clear space.',
+            tag: '45 seconds'
+          }
+        ]
+      },
+      {
+        id: 'energy',
+        name: 'Energy',
+        label: 'Energy Boost',
+        emoji: '⚡',
+        description: 'When you feel sluggish or foggy.',
+        tasks: [
+          {
+            id: 'energy-stand',
+            emoji: '🧍',
+            title: 'Stand up & shake',
+            description: 'Shake arms and legs for a few seconds.',
+            tag: '20 seconds'
+          },
+          {
+            id: 'energy-steps',
+            emoji: '🚶‍♂️',
+            title: 'Take 20 steps',
+            description: 'Walk around your room or hallway.',
+            tag: '30 seconds'
+          },
+          {
+            id: 'energy-cold-water',
+            emoji: '🚰',
+            title: 'Splash cool water',
+            description: 'On your face or wrists for a quick jolt.',
+            tag: '25 seconds'
+          },
+          {
+            id: 'energy-stretch',
+            emoji: '🤸‍♂️',
+            title: 'Quick stretch combo',
+            description: 'Reach up, fold forward, roll back up.',
+            tag: '35 seconds'
+          }
+        ]
+      },
+      {
+        id: 'tidy',
+        name: 'Tidy',
+        label: 'Clear Space',
+        emoji: '🧽',
+        description: 'For visual chaos & messy rooms.',
+        tasks: [
+          {
+            id: 'tidy-surface',
+            emoji: '🧼',
+            title: 'Wipe one surface',
+            description: 'Desk corner, nightstand, counter.',
+            tag: '45 seconds'
+          },
+          {
+            id: 'tidy-trash',
+            emoji: '🗑️',
+            title: 'Find 3 things to toss',
+            description: 'Scraps, packaging, old receipts.',
+            tag: '40 seconds'
+          },
+          {
+            id: 'tidy-clothes',
+            emoji: '👕',
+            title: 'Hang or fold 3 items',
+            description: 'No more than 3. That’s enough.',
+            tag: '35 seconds'
+          },
+          {
+            id: 'tidy-entry',
+            emoji: '🚪',
+            title: 'Reset the entry spot',
+            description: 'Shoes, keys, whatever piles up by the door.',
+            tag: '50 seconds'
+          }
+        ]
+      },
+      {
+        id: 'social',
+        name: 'Social',
+        label: 'Connection',
+        emoji: '❤️',
+        description: 'For feeling lonely or disconnected.',
+        tasks: [
+          {
+            id: 'social-check-in',
+            emoji: '💌',
+            title: 'Send a 1-line check-in',
+            description: '“Thinking of you” is enough.',
+            tag: '30 seconds'
+          },
+          {
+            id: 'social-react',
+            emoji: '👍',
+            title: 'React to a friend’s post',
+            description: 'Something genuine, not just a like.',
+            tag: '25 seconds'
+          },
+          {
+            id: 'social-thank-you',
+            emoji: '🙏',
+            title: 'Thank someone in one sentence',
+            description: 'Text, DM, or a note.',
+            tag: '40 seconds'
+          },
+          {
+            id: 'social-eye-contact',
+            emoji: '👀',
+            title: 'Practice kind eye contact',
+            description: 'Imagine looking at someone with warmth.',
+            tag: '20 seconds'
+          }
+        ]
+      }
+    ];
+
+    const STORAGE_STATE_KEY = 'atomicWins_state_v5';
+    const STORAGE_SETTINGS_KEY = 'atomicWins_settings_v1';
+    const STORAGE_TRACK_KEY = 'atomicWins_track_v1';
+    const STORAGE_ONBOARDED_KEY = 'atomicWins_onboarded_v1';
+    const CUSTOM_TASKS_BASE_KEY = 'atomicWins_customTasks_v1_';
+    const PINNED_BASE_KEY = 'atomicWins_pinned_v2_';
+
+    const DEFAULT_SETTINGS = {
+      streakForgiveness: true,
+      maxPinned: 3,
+      tone: 'encouraging'
+    };
+
+    // ---------- UTILITIES ----------
+    function getTodayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function formatNiceDate(date = new Date()) {
+      return date.toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function shortDayName(date) {
+      return date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2);
+    }
+
+    function parseKeyToDate(key) {
+      if (!key) return null;
+      const parts = key.split('-');
+      if (parts.length !== 3) return null;
+      const [y, m, d] = parts.map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function diffDays(oldKey, newKey) {
+      const d1 = parseKeyToDate(oldKey);
+      const d2 = parseKeyToDate(newKey);
+      if (!d1 || !d2) return null;
+      const MS_PER_DAY = 24 * 60 * 60 * 1000;
+      const diff = (d2 - d1) / MS_PER_DAY;
+      return Math.round(diff);
+    }
+
+    function getTrackById(id) {
+      return TRACKS.find(t => t.id === id) || TRACKS[0];
+    }
+
+    function getDefaultTasksForTrack(trackId) {
+      return getTrackById(trackId).tasks;
+    }
+
+    // ---------- STORAGE ----------
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_STATE_KEY);
+      if (!raw) {
+        return {
+          streak: 0,
+          lastActivityDate: null,
+          totalWins: 0,
+          completionsByDay: {},
+          reflectionsByDay: {}
+        };
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        return {
+          streak: parsed.streak || 0,
+          lastActivityDate: parsed.lastActivityDate || null,
+          totalWins: parsed.totalWins || 0,
+          completionsByDay: parsed.completionsByDay || {},
+          reflectionsByDay: parsed.reflectionsByDay || {}
+        };
+      } catch {
+        return {
+          streak: 0,
+          lastActivityDate: null,
+          totalWins: 0,
+          completionsByDay: {},
+          reflectionsByDay: {}
+        };
+      }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state));
+    }
+
+    function loadSettings() {
+      const raw = localStorage.getItem(STORAGE_SETTINGS_KEY);
+      if (!raw) return { ...DEFAULT_SETTINGS };
+      try {
+        const parsed = JSON.parse(raw);
+        return {
+          streakForgiveness: typeof parsed.streakForgiveness === 'boolean'
+            ? parsed.streakForgiveness
+            : DEFAULT_SETTINGS.streakForgiveness,
+          maxPinned: parsed.maxPinned || DEFAULT_SETTINGS.maxPinned,
+          tone: parsed.tone || DEFAULT_SETTINGS.tone
+        };
+      } catch {
+        return { ...DEFAULT_SETTINGS };
+      }
+    }
+
+    function saveSettings(settings) {
+      localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(settings));
+    }
+
+    function loadSelectedTrackId() {
+      return localStorage.getItem(STORAGE_TRACK_KEY) || 'general';
+    }
+
+    function saveSelectedTrackId(id) {
+      localStorage.setItem(STORAGE_TRACK_KEY, id);
+    }
+
+    function loadCustomTasks(trackId) {
+      const raw = localStorage.getItem(CUSTOM_TASKS_BASE_KEY + trackId);
+      if (!raw) return [];
+      try {
+        const tasks = JSON.parse(raw);
+        return Array.isArray(tasks) ? tasks : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCustomTasks(trackId, tasks) {
+      localStorage.setItem(CUSTOM_TASKS_BASE_KEY + trackId, JSON.stringify(tasks));
+    }
+
+    function loadPinned(trackId) {
+      const raw = localStorage.getItem(PINNED_BASE_KEY + trackId);
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function savePinned(trackId, pinned) {
+      localStorage.setItem(PINNED_BASE_KEY + trackId, JSON.stringify(pinned));
+    }
+
+    function hasOnboarded() {
+      return !!localStorage.getItem(STORAGE_ONBOARDED_KEY);
+    }
+
+    function setOnboarded() {
+      localStorage.setItem(STORAGE_ONBOARDED_KEY, 'yes');
+    }
+
+    // ---------- APP STATE ----------
+    let state = loadState();
+    let settings = loadSettings();
+    let currentTrackId = loadSelectedTrackId();
+    let customTasks = loadCustomTasks(currentTrackId);
+    let tasks = [];
+    let pinnedTaskIds = loadPinned(currentTrackId);
+
+    const todayKey = getTodayKey();
+
+    const dateChipEl = document.getElementById('dateChip');
+    const trackChipEl = document.getElementById('trackChip');
+    const trackChipLabelEl = document.getElementById('trackChipLabel');
+    const tracksListEl = document.getElementById('tracksList');
+
+    const streakValueEl = document.getElementById('streakValue');
+    const todayWinsEl = document.getElementById('todayWins');
+    const totalWinsEl = document.getElementById('totalWins');
+    const streakTagEl = document.getElementById('streakTag');
+    const todayTagEl = document.getElementById('todayTag');
+    const historyGridEl = document.getElementById('historyGrid');
+    const historySubtitleEl = document.getElementById('historySubtitle');
+    const weeklySummaryEl = document.getElementById('weeklySummary');
+    const feedbackEl = document.getElementById('feedbackMessage');
+    const tasksContainerEl = document.getElementById('tasksContainer');
+    const focusSectionEl = document.getElementById('focusSection');
+    const focusContainerEl = document.getElementById('focusContainer');
+    const resetButtonEl = document.getElementById('resetButton');
+    const customTitleInput = document.getElementById('customTitleInput');
+    const customTagInput = document.getElementById('customTagInput');
+    const customAddBtn = document.getElementById('customAddBtn');
+    const reflectionInputEl = document.getElementById('reflectionInput');
+
+    const settingForgivenessEl = document.getElementById('settingForgiveness');
+    const settingMaxPinnedEl = document.getElementById('settingMaxPinned');
+    const settingToneEl = document.getElementById('settingTone');
+
+    // Onboarding elements
+    const onboardingOverlayEl = document.getElementById('onboardingOverlay');
+    const onboardingTitleEl = document.getElementById('onboardingTitle');
+    const onboardingBodyEl = document.getElementById('onboardingBody');
+    const onboardingListEl = document.getElementById('onboardingList');
+    const onboardingNextBtn = document.getElementById('onboardingNext');
+    const onboardingSkipBtn = document.getElementById('onboardingSkip');
+    const onboardingDots = document.querySelectorAll('.onboarding-dot');
+
+    let feedbackTimeoutId = null;
+    let onboardingStep = 0;
+
+    const ONBOARDING_STEPS = [
+      {
+        title: 'Tiny wins, big momentum.',
+        body: 'Atomic Wins is not about massive goals. It’s about actions so small you can finish them in under a minute.',
+        bullets: [
+          'No pressure. No giant checklists.',
+          'Just a few seconds of effort at a time.',
+          'Every tap is a little spark of momentum.'
+        ],
+        button: 'Next'
+      },
+      {
+        title: 'Treat them like quests.',
+        body: 'Each card is a micro-quest. Do it once, tap “Mark as done”, and you’ve earned your win.',
+        bullets: [
+          'Pin star ⭐ quests you want to focus on today.',
+          'Build streaks by logging at least one win per day.',
+          'Miss a day? Forgiveness softens the streak if enabled.'
+        ],
+        button: 'Next'
+      },
+      {
+        title: 'You only owe yourself one win.',
+        body: 'On hard days, your only job is a single tiny win. Everything beyond that is pure bonus XP.',
+        bullets: [
+          'Log at least one micro-win today.',
+          'Write how you feel after your wins.',
+          'Come back tomorrow – keep the streak alive.'
+        ],
+        button: 'Begin'
+      }
+    ];
+
+    const FEEDBACK_TEMPLATES = {
+      encouraging: {
+        first: 'First tiny win logged. Streak begins at 1. 🎯',
+        extend: (streak) => `Streak extended! Day ${streak} survives. 🔥`,
+        forgiving: 'You came back after a missed day. Streak softened, not broken. 💪',
+        newStreak: 'Tiny win registered. New streak forming. 🌱',
+        reset: 'Fresh start. New streak from today. ♻️',
+        combo2: 'Combo x2! You’re stacking tiny wins. ⚡',
+        combo3: 'You’re on a roll. Everything extra is bonus XP. 🏆',
+        generic: 'Nice tiny win. They add up more than you think. ✨'
+      },
+      gentle: {
+        first: 'You showed up. That’s a beautiful start. 🌱',
+        extend: (streak) => `Softly continuing… day ${streak} and counting. ✨`,
+        forgiving: 'You missed a day and still came back. That matters a lot. 💛',
+        newStreak: 'A fresh little streak is beginning. Be kind to yourself. 🌤️',
+        reset: 'New page, same you. Streak starts again from here. 📖',
+        combo2: 'Two tiny acts of care for yourself. That’s enough. 🤍',
+        combo3: 'You’ve already done more than you had to. Rest if you need. 🫧',
+        generic: 'Tiny steps are still steps. You’re doing okay. 🌾'
+      },
+      hype: {
+        first: 'LET’S GO! You just landed your first win. 🚀',
+        extend: (streak) => `Streak locked in. Day ${streak} is a W. 🔒🔥`,
+        forgiving: 'You dipped, but you’re back. That’s champion energy. 🥊',
+        newStreak: 'New streak online. Time to farm easy wins. 🎮',
+        reset: 'Hard reset. Fresh run unlocked. Speedrun this streak. ⚡',
+        combo2: 'Double-hit! Tiny win combo active. 💥',
+        combo3: 'You’re farming XP like a pro. Keep stacking. 🏆',
+        generic: 'Another one. You’re low-key unstoppable. 🧨'
+      }
+    };
+
+    function currentToneTemplates() {
+      return FEEDBACK_TEMPLATES[settings.tone] || FEEDBACK_TEMPLATES.encouraging;
+    }
+
+    function ensureTodayEntry() {
+      if (!state.completionsByDay[todayKey]) {
+        state.completionsByDay[todayKey] = [];
+      }
+      if (!state.reflectionsByDay) {
+        state.reflectionsByDay = {};
+      }
+    }
+
+    function isTaskDoneToday(taskId) {
+      const list = state.completionsByDay[todayKey] || [];
+      return list.includes(taskId);
+    }
+
+    function isTaskPinned(taskId) {
+      return pinnedTaskIds.includes(taskId);
+    }
+
+    function mergeTasks() {
+      const defaults = getDefaultTasksForTrack(currentTrackId);
+      const ids = new Set();
+      const merged = [];
+
+      defaults.forEach(t => {
+        merged.push(t);
+        ids.add(t.id);
+      });
+
+      customTasks.forEach(t => {
+        if (!ids.has(t.id)) {
+          merged.push(t);
+        }
+      });
+
+      tasks = merged;
+      // Clean up pinned that no longer exist
+      pinnedTaskIds = pinnedTaskIds.filter(id => tasks.find(t => t.id === id));
+      savePinned(currentTrackId, pinnedTaskIds);
+    }
+
+    function showFeedbackMessage(text) {
+      if (!feedbackEl) return;
+      feedbackEl.textContent = text;
+      feedbackEl.classList.add('show');
+      if (feedbackTimeoutId) {
+        clearTimeout(feedbackTimeoutId);
+      }
+      feedbackTimeoutId = setTimeout(() => {
+        feedbackEl.classList.remove('show');
+      }, 2000);
+    }
+
+    function buildFeedbackText({ todayCount, streak, gap }) {
+      const tone = currentToneTemplates();
+
+      if (todayCount === 1 && !state.lastActivityDate) {
+        return tone.first;
+      }
+      if (todayCount === 1 && gap === 1) {
+        return tone.extend(streak);
+      }
+      if (todayCount === 1 && gap === 2) {
+        if (settings.streakForgiveness) return tone.forgiving;
+        return tone.reset;
+      }
+      if (todayCount === 1 && (gap === null || gap === undefined)) {
+        return tone.newStreak;
+      }
+      if (todayCount === 1 && gap >= 3) {
+        return tone.reset;
+      }
+      if (todayCount === 2) {
+        return tone.combo2;
+      }
+      if (todayCount >= 3) {
+        return tone.combo3;
+      }
+      return tone.generic;
+    }
+
+    function updateTrackChip() {
+      const track = getTrackById(currentTrackId);
+      trackChipEl.querySelector('.emoji').textContent = track.emoji;
+      trackChipLabelEl.textContent = track.label;
+    }
+
+    function renderTrackSelector() {
+      tracksListEl.innerHTML = '';
+      TRACKS.forEach(track => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'track-pill';
+        if (track.id === currentTrackId) btn.classList.add('active');
+
+        const emojiSpan = document.createElement('span');
+        emojiSpan.className = 'emoji';
+        emojiSpan.textContent = track.emoji;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'track-name';
+        nameSpan.textContent = track.name;
+
+        btn.appendChild(emojiSpan);
+        btn.appendChild(nameSpan);
+
+        btn.title = track.description;
+
+        btn.addEventListener('click', () => {
+          if (track.id === currentTrackId) return;
+          currentTrackId = track.id;
+          saveSelectedTrackId(currentTrackId);
+          customTasks = loadCustomTasks(currentTrackId);
+          pinnedTaskIds = loadPinned(currentTrackId);
+          mergeTasks();
+          updateTrackChip();
+          renderTrackSelector();
+          renderFocusSection();
+          renderTasks();
+          showFeedbackMessage(`Track switched to ${track.name}. New quests loaded. ✨`);
+        });
+
+        tracksListEl.appendChild(btn);
+      });
+    }
+
+    function updateStatsUI() {
+      const todayList = state.completionsByDay[todayKey] || [];
+      const todayCount = todayList.length;
+
+      dateChipEl.textContent = formatNiceDate();
+      streakValueEl.textContent = state.streak;
+      todayWinsEl.textContent = todayCount;
+      totalWinsEl.textContent = state.totalWins;
+
+      if (state.streak === 0) {
+        streakTagEl.textContent = 'No streak yet. Start today.';
+      } else if (state.streak < 3) {
+        streakTagEl.textContent = 'Nice. You’re building the chain.';
+      } else if (state.streak < 7) {
+        streakTagEl.textContent = 'Solid run. Keep feeding it.';
+      } else {
+        streakTagEl.textContent = 'You’re on fire. Don’t break it.';
+      }
+
+      if (todayCount === 0) {
+        todayTagEl.textContent = 'Tap one tiny win to begin.';
+      } else if (todayCount < 3) {
+        todayTagEl.textContent = 'Momentum unlocked. Keep going if you like.';
+      } else {
+        todayTagEl.textContent = 'You’ve already done plenty. Extra is bonus.';
+      }
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      historyGridEl.innerHTML = '';
+
+      const today = new Date();
+      let maxCount = 0;
+      const days = [];
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(today.getDate() - i);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const count = (state.completionsByDay[key] || []).length;
+        maxCount = Math.max(maxCount, count);
+        days.push({ date: d, key, count });
+      }
+
+      days.forEach(({ date, key, count }) => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        if (key === todayKey) item.classList.add('today');
+
+        const dayLabel = document.createElement('div');
+        dayLabel.className = 'history-day';
+        dayLabel.textContent = shortDayName(date);
+
+        const bar = document.createElement('div');
+        bar.className = 'history-bar';
+
+        const fill = document.createElement('div');
+        fill.className = 'history-bar-fill';
+        const width = maxCount === 0 ? 0 : (count / maxCount) * 100;
+        fill.style.width = `${width}%`;
+
+        bar.appendChild(fill);
+
+        const countLabel = document.createElement('div');
+        countLabel.className = 'history-count';
+        countLabel.textContent = count === 0 ? '–' : `${count}`;
+
+        item.appendChild(dayLabel);
+        item.appendChild(bar);
+        item.appendChild(countLabel);
+        historyGridEl.appendChild(item);
+      });
+
+      const total7 = days.reduce((sum, d) => sum + d.count, 0);
+      if (total7 === 0) {
+        historySubtitleEl.textContent = 'No wins logged in the last 7 days yet.';
+        weeklySummaryEl.textContent = 'Once you start logging wins, your weekly summary will appear here.';
+        return;
+      } else {
+        historySubtitleEl.textContent = `${total7} wins in the last 7 days.`;
+      }
+
+      const activeDays = days.filter(d => d.count > 0).length;
+      const best = days.reduce((best, d) => d.count > best.count ? d : best, { count: -1 });
+      const bestLabel = best.count > 0 ? `${shortDayName(best.date)} (${best.count})` : '—';
+
+      const reflections = state.reflectionsByDay || {};
+      const recentReflections = [];
+      days.forEach(d => {
+        const r = reflections[d.key];
+        if (r && r.trim()) {
+          recentReflections.push({ key: d.key, text: r.trim() });
+        }
+      });
+
+      let summary = `Active days: <span class="highlight">${activeDays}/7</span>. Best day: <span class="highlight">${bestLabel}</span>.`;
+      if (recentReflections.length > 0) {
+        const last = recentReflections[recentReflections.length - 1];
+        summary += ` Last note: “${last.text.slice(0, 40)}${last.text.length > 40 ? '…' : ''}”`;
+      }
+
+      weeklySummaryEl.innerHTML = summary;
+    }
+
+    function togglePin(taskId) {
+      if (isTaskPinned(taskId)) {
+        pinnedTaskIds = pinnedTaskIds.filter(id => id !== taskId);
+      } else {
+        const maxPinned = Number(settings.maxPinned) || 3;
+        if (pinnedTaskIds.length >= maxPinned) {
+          pinnedTaskIds.shift();
+        }
+        pinnedTaskIds.push(taskId);
+      }
+      savePinned(currentTrackId, pinnedTaskIds);
+      pinnedTaskIds = pinnedTaskIds.filter(id => tasks.find(t => t.id === id));
+      savePinned(currentTrackId, pinnedTaskIds);
+      renderFocusSection();
+      renderTasks();
+    }
+
+    function createTaskCard(task, options = {}) {
+      const { inFocusZone = false } = options;
+
+      const card = document.createElement('div');
+      card.className = 'task-card';
+      if (isTaskDoneToday(task.id)) {
+        card.classList.add('done');
+      }
+      if (inFocusZone) {
+        card.classList.add('focus-card');
+      }
+
+      const emoji = document.createElement('div');
+      emoji.className = 'task-emoji';
+      emoji.textContent = task.emoji || '⭐';
+
+      const main = document.createElement('div');
+      main.className = 'task-main';
+
+      const title = document.createElement('div');
+      title.className = 'task-title';
+      title.textContent = task.title;
+
+      const desc = document.createElement('div');
+      desc.className = 'task-desc';
+      desc.textContent = task.description || '';
+
+      const metaRow = document.createElement('div');
+      metaRow.className = 'task-meta-row';
+
+      const metaLeft = document.createElement('div');
+      metaLeft.className = 'task-meta-left';
+
+      const tag = document.createElement('div');
+      tag.className = 'task-tag';
+      tag.textContent = task.tag || 'tiny win';
+
+      const pinBtn = document.createElement('button');
+      pinBtn.className = 'pin-btn';
+      const pinned = isTaskPinned(task.id);
+      pinBtn.classList.toggle('pinned', pinned);
+      pinBtn.textContent = pinned ? '★ Focused' : '☆ Focus';
+
+      pinBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePin(task.id);
+      });
+
+      metaLeft.appendChild(tag);
+      metaLeft.appendChild(pinBtn);
+
+      const btn = document.createElement('button');
+      btn.className = 'task-btn';
+      btn.textContent = 'Mark as done';
+
+      if (isTaskDoneToday(task.id)) {
+        btn.classList.add('done');
+        btn.textContent = 'Completed';
+      }
+
+      btn.addEventListener('click', () => {
+        if (isTaskDoneToday(task.id)) return;
+
+        ensureTodayEntry();
+        const beforeCount = state.completionsByDay[todayKey].length;
+        state.completionsByDay[todayKey].push(task.id);
+        state.totalWins += 1;
+
+        let gap = null;
+        if (beforeCount === 0) {
+          if (!state.lastActivityDate) {
+            state.streak = 1;
+          } else {
+            gap = diffDays(state.lastActivityDate, todayKey);
+
+            if (gap === 1) {
+              state.streak += 1;
+            } else if (gap === 2 && settings.streakForgiveness) {
+              state.streak = Math.max(1, state.streak - 1);
+            } else {
+              state.streak = 1;
+            }
+          }
+          state.lastActivityDate = todayKey;
+        }
+
+        saveState(state);
+
+        const nowCount = state.completionsByDay[todayKey].length;
+        const fbText = buildFeedbackText({
+          todayCount: nowCount,
+          streak: state.streak,
+          gap
+        });
+        showFeedbackMessage(fbText);
+
+        updateStatsUI();
+        renderFocusSection();
+        renderTasks();
+      });
+
+      metaRow.appendChild(metaLeft);
+      metaRow.appendChild(btn);
+
+      main.appendChild(title);
+      if (task.description) main.appendChild(desc);
+      main.appendChild(metaRow);
+
+      card.appendChild(emoji);
+      card.appendChild(main);
+
+      return card;
+    }
+
+    function renderFocusSection() {
+      focusContainerEl.innerHTML = '';
+      pinnedTaskIds = pinnedTaskIds.filter(id => tasks.find(t => t.id === id));
+      savePinned(currentTrackId, pinnedTaskIds);
+
+      const focusTasks = tasks.filter(t => pinnedTaskIds.includes(t.id));
+      if (focusTasks.length === 0) {
+        focusSectionEl.style.display = 'none';
+        return;
+      }
+
+      focusSectionEl.style.display = 'block';
+      focusTasks.forEach(task => {
+        const card = createTaskCard(task, { inFocusZone: true });
+        focusContainerEl.appendChild(card);
+      });
+    }
+
+    function renderTasks() {
+      tasksContainerEl.innerHTML = '';
+      const regularTasks = tasks.filter(t => !pinnedTaskIds.includes(t.id));
+
+      regularTasks.forEach(task => {
+        const card = createTaskCard(task);
+        tasksContainerEl.appendChild(card);
+      });
+    }
+
+    function attachResetHandler() {
+      resetButtonEl.addEventListener('click', () => {
+        const ok = confirm('Reset ALL Atomic Wins data (stats + custom tasks + focus + reflections) on this device? This cannot be undone.');
+        if (!ok) return;
+        state = {
+          streak: 0,
+          lastActivityDate: null,
+          totalWins: 0,
+          completionsByDay: {},
+          reflectionsByDay: {}
+        };
+        TRACKS.forEach(track => {
+          localStorage.removeItem(CUSTOM_TASKS_BASE_KEY + track.id);
+          localStorage.removeItem(PINNED_BASE_KEY + track.id);
+        });
+        customTasks = loadCustomTasks(currentTrackId);
+        pinnedTaskIds = [];
+        mergeTasks();
+        saveState(state);
+        reflectionInputEl.value = '';
+        updateStatsUI();
+        renderFocusSection();
+        renderTasks();
+        showFeedbackMessage('Everything reset. Fresh run unlocked. 🔄');
+      });
+    }
+
+    function attachCustomTaskHandler() {
+      customAddBtn.addEventListener('click', () => {
+        const title = (customTitleInput.value || '').trim();
+        const tag = (customTagInput.value || '').trim();
+
+        if (!title) {
+          alert('Give your tiny win a short title, e.g. “Send 1 kind message”.');
+          return;
+        }
+
+        const task = {
+          id: 'user-' + currentTrackId + '-' + Date.now().toString(36),
+          emoji: '⭐',
+          title,
+          description: '',
+          tag: tag || 'tiny win'
+        };
+
+        customTasks.push(task);
+        saveCustomTasks(currentTrackId, customTasks);
+        customTitleInput.value = '';
+        customTagInput.value = '';
+
+        mergeTasks();
+        renderFocusSection();
+        renderTasks();
+        showFeedbackMessage('New tiny quest added to your list. ✨');
+      });
+    }
+
+    function attachReflectionHandler() {
+      reflectionInputEl.addEventListener('input', () => {
+        const text = reflectionInputEl.value || '';
+        if (!state.reflectionsByDay) {
+          state.reflectionsByDay = {};
+        }
+        if (text.trim().length === 0) {
+          delete state.reflectionsByDay[todayKey];
+        } else {
+          state.reflectionsByDay[todayKey] = text;
+        }
+        saveState(state);
+        renderHistory();
+      });
+    }
+
+    function populateReflection() {
+      if (!state.reflectionsByDay) {
+        state.reflectionsByDay = {};
+      }
+      const existing = state.reflectionsByDay[todayKey] || '';
+      reflectionInputEl.value = existing;
+    }
+
+    function attachSettingsHandler() {
+      // Initialize controls
+      settingForgivenessEl.checked = !!settings.streakForgiveness;
+      settingMaxPinnedEl.value = String(settings.maxPinned || 3);
+      settingToneEl.value = settings.tone || 'encouraging';
+
+      settingForgivenessEl.addEventListener('change', () => {
+        settings.streakForgiveness = settingForgivenessEl.checked;
+        saveSettings(settings);
+        showFeedbackMessage(settings.streakForgiveness
+          ? 'Streak forgiveness enabled. One-day misses hurt less. 💛'
+          : 'Streak forgiveness disabled. Missed days fully reset the run. 🔄');
+      });
+
+      settingMaxPinnedEl.addEventListener('change', () => {
+        const val = Number(settingMaxPinnedEl.value) || 3;
+        settings.maxPinned = val;
+        saveSettings(settings);
+        // If too many pinned, trim
+        if (pinnedTaskIds.length > val) {
+          pinnedTaskIds = pinnedTaskIds.slice(0, val);
+          savePinned(currentTrackId, pinnedTaskIds);
+          renderFocusSection();
+          renderTasks();
+        }
+        showFeedbackMessage(`Max focus quests set to ${val}. ⭐`);
+      });
+
+      settingToneEl.addEventListener('change', () => {
+        settings.tone = settingToneEl.value || 'encouraging';
+        saveSettings(settings);
+        const msg = settings.tone === 'gentle'
+          ? 'Tone set to gentle. The app will talk softly to you. 🤍'
+          : settings.tone === 'hype'
+          ? 'Tone set to hype. Expect more energy. 🧨'
+          : 'Tone set to encouraging. Balanced support activated. ✨';
+        showFeedbackMessage(msg);
+      });
+    }
+
+    // ---------- ONBOARDING ----------
+    function updateOnboardingUI() {
+      const stepData = ONBOARDING_STEPS[onboardingStep];
+      onboardingTitleEl.textContent = stepData.title;
+      onboardingBodyEl.textContent = stepData.body;
+      onboardingListEl.innerHTML = '';
+      stepData.bullets.forEach(b => {
+        const li = document.createElement('li');
+        li.textContent = b;
+        onboardingListEl.appendChild(li);
+      });
+      onboardingNextBtn.textContent = stepData.button;
+      onboardingDots.forEach(dot => {
+        const stepIndex = Number(dot.getAttribute('data-step'));
+        dot.classList.toggle('active', stepIndex === onboardingStep);
+      });
+    }
+
+    function startOnboardingIfNeeded() {
+      if (hasOnboarded()) {
+        onboardingOverlayEl.style.display = 'none';
+        return;
+      }
+      onboardingStep = 0;
+      updateOnboardingUI();
+      onboardingOverlayEl.style.display = 'flex';
+
+      onboardingNextBtn.onclick = () => {
+        if (onboardingStep < ONBOARDING_STEPS.length - 1) {
+          onboardingStep += 1;
+          updateOnboardingUI();
+        } else {
+          setOnboarded();
+          onboardingOverlayEl.style.display = 'none';
+        }
+      };
+
+      onboardingSkipBtn.onclick = () => {
+        setOnboarded();
+        onboardingOverlayEl.style.display = 'none';
+      };
+    }
+
+    // ---------- INIT ----------
+    (function init() {
+      ensureTodayEntry();
+      mergeTasks();
+      dateChipEl.textContent = formatNiceDate();
+      updateTrackChip();
+      renderTrackSelector();
+      updateStatsUI();
+      renderFocusSection();
+      renderTasks();
+      attachResetHandler();
+      attachCustomTaskHandler();
+      attachReflectionHandler();
+      populateReflection();
+      attachSettingsHandler();
+      startOnboardingIfNeeded();
+    })();
+  </script>
+</body>
+</html>
+
