@@ -1,157 +1,271 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <title>Atomic Wins – Micro Achievements Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Atomic Wins – Brutal Accountability Upgrade</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#020617" />
+  <!-- PWA manifest will be injected via JS -->
+  <link id="dynamicManifest" rel="manifest" href="" />
 
   <style>
     :root {
-      --bg: #050816;
-      --card: #0f172a;
+      --bg: #020617;
+      --bg-soft: #020617;
+      --card: #020617;
+      --card-soft: #020617;
       --accent: #22c55e;
-      --accent-soft: #16a34a33;
+      --accent-soft: #22c55e33;
+      --accent-strong: #4ade80;
+      --accent-stronger: #22c55e;
+      --danger: #f97373;
+      --warning: #fbbf24;
       --text-main: #e5e7eb;
       --text-muted: #9ca3af;
       --border-subtle: #1f2937;
-      --danger: #f97373;
-      --history-bg: #020617;
-      --history-bar: #4ade80;
-      --history-bar-faint: #1f2937;
-      --focus-border: rgba(250, 204, 21, 0.9);
+      --border-strong: #374151;
+      --ring-track: #111827;
+      --ring-bg: #020617;
+      --chart-grid: #1f2937;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    [data-theme="light"] {
+      --bg: #e5e7eb;
+      --bg-soft: #f3f4f6;
+      --card: #ffffff;
+      --card-soft: #f9fafb;
+      --accent: #16a34a;
+      --accent-soft: #16a34a33;
+      --accent-strong: #22c55e;
+      --accent-stronger: #16a34a;
+      --danger: #b91c1c;
+      --warning: #d97706;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-subtle: #d1d5db;
+      --border-strong: #9ca3af;
+      --ring-track: #e5e7eb;
+      --ring-bg: #f9fafb;
+      --chart-grid: #e5e7eb;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1f2933, #020617 55%);
-      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 24px 12px 40px;
+      padding: 20px 10px 32px;
+      background:
+        radial-gradient(circle at top, #1d293f, #020617 50%);
+      color: var(--text-main);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    [data-theme="light"] body {
+      background:
+        radial-gradient(circle at top, #e5e7eb, #f9fafb 50%);
     }
 
     .app {
       width: 100%;
-      max-width: 460px;
-      background: linear-gradient(to bottom right, #020617ee, #020617f9);
-      border-radius: 18px;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      background: radial-gradient(circle at top left, #020617, #020617ee);
+      border-radius: 22px;
+      border: 1px solid rgba(148,163,184,0.25);
       box-shadow:
-        0 22px 45px rgba(0,0,0,0.65),
-        0 0 0 1px rgba(148,163,184,0.15);
+        0 20px 40px rgba(0,0,0,0.75),
+        0 0 0 1px rgba(15,23,42,0.9);
       overflow: hidden;
-      border: 1px solid rgba(148,163,184,0.18);
       position: relative;
-      z-index: 1;
+    }
+
+    [data-theme="light"] .app {
+      background: #f9fafb;
+      box-shadow:
+        0 16px 40px rgba(15,23,42,0.18),
+        0 0 0 1px rgba(148,163,184,0.25);
+    }
+
+    @media (max-width: 900px) {
+      .app { display: block; max-width: 480px; }
     }
 
     .app-header {
-      padding: 18px 18px 10px;
-      border-bottom: 1px solid rgba(148,163,184,0.15);
-      background: radial-gradient(circle at top left, #22c55e26, transparent 55%);
+      grid-column: 1 / -1;
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid rgba(55,65,81,0.8);
+      background:
+        radial-gradient(circle at top left, #22c55e33, transparent 55%);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-start;
     }
 
-    .title-row {
+    .header-main {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-block {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px;
       gap: 8px;
     }
 
     .title {
-      font-weight: 700;
-      font-size: 1.3rem;
-      letter-spacing: 0.02em;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
-    .title-badge {
+    .badge-main {
       font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      padding: 3px 7px;
+      letter-spacing: 0.12em;
+      padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(34,197,94,0.6);
-      color: var(--accent);
-      background: rgba(22,163,74,0.1);
+      border: 1px solid rgba(34,197,94,0.8);
+      background: rgba(16,185,129,0.12);
+      color: var(--accent-strong);
     }
 
     .subtitle {
-      font-size: 0.8rem;
+      margin-top: 3px;
+      font-size: 0.83rem;
       color: var(--text-muted);
     }
 
-    .date-chip-wrap {
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .theme-toggle input {
+      width: 32px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .header-secondary {
+      min-width: 160px;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
     }
 
-    .date-chip {
+    .chip-date {
       font-size: 0.75rem;
-      padding: 4px 9px;
+      padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.4);
+      border: 1px solid rgba(148,163,184,0.7);
+      background: #020617;
       color: var(--text-muted);
-      background: rgba(15,23,42,0.85);
-      white-space: nowrap;
     }
 
-    .track-chip {
-      font-size: 0.72rem;
+    [data-theme="light"] .chip-date {
+      background: #ffffff;
+    }
+
+    .chip-track {
+      font-size: 0.74rem;
       padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.5);
-      color: var(--accent);
+      border: 1px solid rgba(148,163,184,0.7);
       background: rgba(15,23,42,0.9);
+      color: var(--accent);
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
 
-    .track-chip span.emoji {
-      font-size: 0.9rem;
+    [data-theme="light"] .chip-track {
+      background: #f3f4f6;
     }
 
+    .chip-track span:first-child {
+      font-size: 0.95rem;
+    }
+
+    /* Stats row */
     .stats-row {
+      margin-top: 8px;
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
     }
 
     .stat-card {
       flex: 1;
+      min-width: 160px;
+      background: radial-gradient(circle at top, #111827, #020617);
       border-radius: 12px;
       padding: 8px 9px;
-      background: radial-gradient(circle at top, #16a34a1f, #02061700 60%);
       border: 1px solid rgba(55,65,81,0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
+    [data-theme="light"] .stat-card {
+      background: #ffffff;
+      border-color: #d1d5db;
+    }
+
+    .ring {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle, var(--ring-bg) 56%, transparent 57%),
+        conic-gradient(var(--accent-stronger) calc(var(--p)*1%), var(--ring-track) 0);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+
+    .ring-inner { z-index: 1; }
+
+    .stat-main { flex: 1; }
+
     .stat-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       color: var(--text-muted);
       margin-bottom: 2px;
     }
 
     .stat-value {
+      font-size: 0.96rem;
       font-weight: 700;
-      font-size: 1rem;
       display: flex;
       align-items: baseline;
-      gap: 4px;
+      gap: 3px;
     }
 
     .stat-suffix {
@@ -160,24 +274,27 @@
     }
 
     .stat-tag {
-      margin-top: 3px;
-      font-size: 0.7rem;
+      margin-top: 2px;
+      font-size: 0.72rem;
       color: var(--accent);
     }
 
+    .stat-tag.warning { color: var(--warning); }
+    .stat-tag.danger { color: var(--danger); }
+
     .feedback {
       margin-top: 10px;
-      font-size: 0.78rem;
-      color: var(--accent);
-      background: rgba(34,197,94,0.08);
-      border-radius: 999px;
+      font-size: 0.8rem;
       padding: 6px 10px;
-      border: 1px solid rgba(34,197,94,0.4);
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.55);
+      background: rgba(22,163,74,0.13);
+      color: var(--accent);
+      max-width: 640px;
       opacity: 0;
       transform: translateY(4px);
       pointer-events: none;
-      transition: opacity 0.18s ease, transform 0.18s ease;
-      min-height: 0;
+      transition: opacity 0.16s ease, transform 0.16s ease;
     }
 
     .feedback.show {
@@ -185,47 +302,73 @@
       transform: translateY(0);
     }
 
-    .content {
-      padding: 10px 12px 16px;
+    /* Columns */
+    .col-main {
+      padding: 10px 12px 14px;
+      border-right: 1px solid rgba(15,23,42,0.9);
+    }
+
+    .col-side {
+      padding: 10px 12px 14px;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+    }
+
+    [data-theme="light"] .col-side {
+      background: #f3f4f6;
+      border-left: 1px solid #d1d5db;
     }
 
     .hint {
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
-      margin-bottom: 8px;
       padding: 6px 8px;
       border-radius: 10px;
-      background: rgba(15,23,42,0.85);
-      border: 1px dashed rgba(55,65,81,0.9);
+      border: 1px dashed rgba(75,85,99,0.9);
+      background: rgba(15,23,42,0.9);
+      margin-bottom: 8px;
     }
 
-    /* Tracks selector */
-    .tracks-box {
-      margin-top: 6px;
-      margin-bottom: 10px;
-      background: rgba(15,23,42,0.96);
+    [data-theme="light"] .hint {
+      background: #ffffff;
+      border-color: #d1d5db;
+    }
+
+    /* Track selector */
+    .section-card {
       border-radius: 14px;
-      padding: 8px 9px 7px;
-      border: 1px solid rgba(55,65,81,0.95);
+      padding: 8px 9px;
+      background: var(--card-soft);
+      border: 1px solid var(--border-strong);
+      margin-bottom: 8px;
     }
 
-    .tracks-title {
+    .section-title {
       font-size: 0.78rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       color: var(--text-muted);
       margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .section-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
     }
 
     .tracks-list {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      margin-top: 2px;
     }
 
     .track-pill {
       border-radius: 999px;
-      border: 1px solid rgba(55,65,81,0.9);
+      border: 1px solid var(--border-strong);
       background: #020617;
       color: var(--text-muted);
       font-size: 0.76rem;
@@ -234,29 +377,70 @@
       align-items: center;
       gap: 4px;
       cursor: pointer;
+      transition: background 0.12s ease, border 0.12s ease, transform 0.08s ease;
     }
 
-    .track-pill span.emoji {
-      font-size: 0.9rem;
+    [data-theme="light"] .track-pill {
+      background: #f9fafb;
     }
+
+    .track-pill span:first-child { font-size: 0.95rem; }
 
     .track-pill.active {
       border-color: rgba(34,197,94,0.9);
       background: rgba(22,163,74,0.18);
       color: var(--accent);
+      transform: translateY(-1px);
     }
 
-    .track-pill .track-name {
-      font-weight: 500;
+    /* Micro-goals */
+    .micro-goal-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
     }
 
+    .micro-goal-row input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .micro-input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.76rem;
+      padding: 5px 8px;
+    }
+
+    [data-theme="light"] .micro-input {
+      background: #f9fafb;
+    }
+
+    .micro-input::placeholder { color: #6b7280; }
+
+    .micro-summary {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Focus section */
     .focus-section {
-      margin-top: 8px;
-      margin-bottom: 8px;
-      background: rgba(24, 24, 27, 0.95);
       border-radius: 14px;
-      border: 1px solid rgba(250, 204, 21, 0.35);
-      padding: 8px 9px 8px;
+      border: 1px solid rgba(250,204,21,0.6);
+      background: radial-gradient(circle at top, rgba(234,179,8,0.1), #020617);
+      padding: 7px 9px;
+      margin-bottom: 8px;
+    }
+
+    [data-theme="light"] .focus-section {
+      background: #fef9c3;
     }
 
     .focus-header {
@@ -270,14 +454,14 @@
     .focus-title {
       font-size: 0.78rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       color: #facc15;
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    .focus-subtitle {
+    .focus-sub {
       font-size: 0.7rem;
       color: var(--text-muted);
     }
@@ -286,334 +470,303 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin-top: 4px;
     }
 
-    .history {
-      margin-top: 8px;
-      margin-bottom: 10px;
-      background: var(--history-bg);
-      border-radius: 12px;
-      padding: 8px 9px 6px;
-      border: 1px solid rgba(31,41,55,0.9);
-    }
-
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-      gap: 6px;
-    }
-
-    .history-title {
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-    }
-
-    .history-subtitle {
+    /* History / calendar */
+    .pill-toggle {
       font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
       color: var(--text-muted);
+      cursor: pointer;
     }
 
     .history-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 4px;
-      margin-top: 4px;
+      margin-top: 5px;
     }
 
     .history-item {
       text-align: center;
-      font-size: 0.68rem;
-      color: var(--text-muted);
+      font-size: 0.7rem;
     }
 
     .history-day {
-      margin-bottom: 2px;
       font-size: 0.65rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 1px;
     }
 
     .history-bar {
       width: 100%;
-      border-radius: 999px;
       height: 12px;
-      background: var(--history-bar-faint);
+      border-radius: 999px;
+      background: #111827;
       overflow: hidden;
-      position: relative;
     }
 
-    .history-bar-fill {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+    [data-theme="light"] .history-bar {
+      background: #e5e7eb;
+    }
+
+    .history-fill {
+      height: 100%;
       width: 0%;
-      background: var(--history-bar);
-      transition: width 0.15s ease;
+      background: var(--accent-strong);
+      transition: width 0.18s ease;
     }
 
     .history-count {
-      margin-top: 1px;
-      font-size: 0.65rem;
+      font-size: 0.66rem;
       color: var(--text-muted);
+      margin-top: 1px;
     }
 
     .history-item.today .history-bar {
-      box-shadow: 0 0 0 1px rgba(74,222,128,0.8);
+      box-shadow: 0 0 0 1px rgba(234,179,8,0.9);
     }
 
     .history-item.today .history-day {
-      color: var(--accent);
+      color: var(--accent-strong);
     }
 
-    .weekly-summary {
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px dashed rgba(55,65,81,0.8);
-      font-size: 0.72rem;
+    .history-summary {
+      font-size: 0.73rem;
       color: var(--text-muted);
+      margin-top: 6px;
+      border-top: 1px dashed var(--border-subtle);
+      padding-top: 4px;
     }
 
-    .weekly-summary span.highlight {
-      color: var(--accent);
+    .history-summary span.highlight {
+      color: var(--accent-strong);
       font-weight: 600;
     }
 
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-top: 5px;
+    }
+
+    .calendar-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    [data-theme="light"] .calendar-cell {
+      background: #f9fafb;
+    }
+
+    .calendar-cell.has {
+      background: rgba(34,197,94,0.2);
+      color: var(--accent-strong);
+      border-color: rgba(34,197,94,0.7);
+    }
+
+    .calendar-cell.today {
+      box-shadow: 0 0 0 2px rgba(234,179,8,0.9);
+    }
+
+    /* Tasks */
     .tasks {
+      margin-top: 6px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
+      gap: 8px;
     }
 
     .task-card {
-      background: radial-gradient(circle at top left, #1e293b, #020617);
       border-radius: 14px;
-      padding: 10px 11px;
-      border: 1px solid rgba(55,65,81,0.95);
+      background: radial-gradient(circle at top left, #111827, #020617);
+      border: 1px solid var(--border-strong);
       display: flex;
-      gap: 9px;
-      align-items: flex-start;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      gap: 8px;
+      padding: 9px 10px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border 0.12s ease;
+    }
+
+    [data-theme="light"] .task-card {
+      background: #ffffff;
     }
 
     .task-card:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 18px rgba(0,0,0,0.35);
-      border-color: rgba(94,234,212,0.75);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.45);
+      border-color: rgba(56,189,248,0.8);
     }
 
     .task-card.done {
       border-color: rgba(34,197,94,0.95);
-      background: radial-gradient(circle at top left, #16a34a33, #020617);
+      background: radial-gradient(circle at top left, #16a34a2a, #020617);
     }
 
-    .task-card.focus-card {
-      border-color: var(--focus-border);
-      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.35), 0 10px 18px rgba(0,0,0,0.35);
+    [data-theme="light"] .task-card.done {
+      background: #dcfce7;
     }
 
     .task-emoji {
       font-size: 1.4rem;
-      flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
-    .task-main {
-      flex: 1;
-    }
+    .task-main { flex: 1; }
 
     .task-title {
-      font-size: 0.95rem;
+      font-size: 0.96rem;
       font-weight: 600;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
 
     .task-desc {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .task-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .task-meta-left {
-      display: flex;
-      align-items: center;
       gap: 6px;
       flex-wrap: wrap;
     }
 
     .task-tag {
-      font-size: 0.7rem;
-      padding: 3px 7px;
+      font-size: 0.72rem;
+      padding: 2px 7px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
+      border: 1px solid var(--border-subtle);
       color: var(--text-muted);
     }
 
     .pin-btn {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       padding: 3px 7px;
       border-radius: 999px;
-      border: 1px solid rgba(250, 204, 21, 0.7);
-      background: rgba(250, 204, 21, 0.05);
+      border: 1px solid rgba(234,179,8,0.8);
+      background: rgba(234,179,8,0.1);
       color: #facc15;
       cursor: pointer;
     }
 
     .pin-btn.pinned {
-      background: rgba(250, 204, 21, 0.18);
+      background: rgba(234,179,8,0.2);
     }
 
-    .task-btn {
-      border: none;
-      outline: none;
-      padding: 5px 9px;
-      font-size: 0.78rem;
+    .task-actions {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
       border-radius: 999px;
-      cursor: pointer;
+      border: none;
+      padding: 4px 9px;
+      font-size: 0.76rem;
       font-weight: 600;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
       background: var(--accent-soft);
       color: var(--accent);
-      transition: background 0.12s ease, transform 0.08s ease, box-shadow 0.1s ease;
-      box-shadow: 0 2px 6px rgba(22,163,74,0.35);
+      box-shadow: 0 2px 5px rgba(22,163,74,0.45);
     }
 
-    .task-btn:hover {
-      background: rgba(22,163,74,0.35);
+    .btn-primary:hover {
+      box-shadow: 0 6px 14px rgba(22,163,74,0.5);
       transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(22,163,74,0.45);
     }
 
-    .task-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(22,163,74,0.35);
+    .btn-danger {
+      background: rgba(239,68,68,0.18);
+      color: #fecaca;
     }
 
-    .task-btn.done {
-      background: rgba(22,163,74,0.12);
+    .btn-ghost {
+      background: transparent;
+      border: 1px dashed var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .btn-small {
+      padding: 3px 7px;
+      font-size: 0.72rem;
+    }
+
+    .btn-disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-primary.done {
+      background: rgba(22,163,74,0.15);
       color: var(--text-main);
       box-shadow: none;
-      cursor: default;
     }
 
-    .task-btn.done::before {
-      content: "✓";
-      font-size: 0.75rem;
-    }
-
-    .custom-box {
-      margin-top: 12px;
-      background: rgba(15,23,42,0.96);
-      border-radius: 14px;
-      padding: 9px 10px 10px;
-      border: 1px solid rgba(55,65,81,0.95);
-    }
-
-    .custom-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .custom-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
-
+    /* Custom tasks */
     .input-row {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-    }
-
-    .custom-input {
-      flex: 1;
-      min-width: 0;
-      background: #020617;
-      border-radius: 999px;
-      border: 1px solid rgba(55,65,81,0.9);
-      padding: 6px 9px;
-      font-size: 0.78rem;
-      color: var(--text-main);
-    }
-
-    .custom-input::placeholder {
-      color: #6b7280;
-    }
-
-    .custom-add-btn {
-      border-radius: 999px;
-      border: none;
-      padding: 6px 10px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: rgba(37,99,235,0.15);
-      color: #60a5fa;
-      white-space: nowrap;
-      transition: background 0.12s ease, transform 0.08s ease;
-    }
-
-    .custom-add-btn:hover {
-      background: rgba(37,99,235,0.3);
-      transform: translateY(-1px);
-    }
-
-    .custom-hint {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .reflection-box {
-      margin-top: 12px;
-      background: rgba(12, 18, 32, 0.98);
-      border-radius: 14px;
-      padding: 8px 10px 9px;
-      border: 1px solid rgba(55,65,81,0.95);
-    }
-
-    .reflection-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
       margin-bottom: 4px;
     }
 
-    .reflection-input {
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid rgba(55,65,81,0.9);
+    .input-pill {
+      flex: 1;
+      min-width: 0;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
       background: #020617;
       color: var(--text-main);
       font-size: 0.78rem;
-      padding: 6px 8px;
-      resize: none;
-      min-height: 32px;
+      padding: 6px 9px;
     }
 
-    .reflection-input::placeholder {
-      color: #6b7280;
+    [data-theme="light"] .input-pill {
+      background: #f9fafb;
+    }
+
+    .input-pill::placeholder { color: #6b7280; }
+
+    /* Reflection */
+    .reflection-input {
+      width: 100%;
+      min-height: 34px;
+      resize: none;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      padding: 6px 8px;
+    }
+
+    [data-theme="light"] .reflection-input {
+      background: #f9fafb;
     }
 
     .reflection-hint {
@@ -622,25 +775,33 @@
       color: var(--text-muted);
     }
 
-    .settings-box {
-      margin-top: 12px;
-      background: rgba(15,23,42,0.96);
+    /* Right column panels */
+    .panel {
       border-radius: 14px;
-      padding: 8px 10px 9px;
-      border: 1px solid rgba(55,65,81,0.95);
+      border: 1px solid var(--border-strong);
+      background: var(--card-soft);
+      padding: 8px 9px;
+      margin-bottom: 8px;
       font-size: 0.78rem;
       color: var(--text-muted);
     }
 
-    .settings-title {
+    .panel-title {
       font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.09em;
       color: var(--text-muted);
-      margin-bottom: 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .panel-badge {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
     }
 
     .settings-row {
@@ -660,444 +821,856 @@
 
     .settings-label {
       font-size: 0.76rem;
+      max-width: 60%;
+    }
+
+    .settings-label small {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--text-muted);
     }
 
     .settings-control {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      flex-wrap: wrap;
     }
 
     .settings-checkbox {
+      width: 15px;
+      height: 15px;
       accent-color: var(--accent);
-      width: 14px;
-      height: 14px;
     }
 
-    .settings-select {
-      background: #020617;
+    .select-pill,
+    .input-pill-sm {
       border-radius: 999px;
-      border: 1px solid rgba(55,65,81,0.9);
+      border: 1px solid var(--border-strong);
+      background: #020617;
       color: var(--text-main);
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       padding: 4px 8px;
     }
 
-    .footer {
-      padding: 8px 12px 12px;
+    [data-theme="light"] .select-pill,
+    [data-theme="light"] .input-pill-sm {
+      background: #f9fafb;
+    }
+
+    .input-pill-sm[type="time"] { min-width: 86px; }
+
+    .reminder-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 3px;
+    }
+
+    .reminder-index {
       font-size: 0.7rem;
       color: var(--text-muted);
-      border-top: 1px solid rgba(31,41,55,0.9);
+      width: 14px;
+      text-align: center;
+    }
+
+    .reminder-msg {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.7rem;
+      padding: 3px 7px;
+    }
+
+    [data-theme="light"] .reminder-msg {
+      background: #f9fafb;
+    }
+
+    /* Analytics */
+    .analytics-chart {
+      margin-top: 5px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      padding: 6px;
+    }
+
+    [data-theme="light"] .analytics-chart {
+      background: #f9fafb;
+    }
+
+    .analytics-chart canvas {
+      width: 100%;
+      height: 115px;
+      display: block;
+    }
+
+    .analytics-meta {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .analytics-meta span.highlight {
+      color: var(--accent-strong);
+      font-weight: 600;
+    }
+
+    /* Video */
+    .video-preview {
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      padding: 6px;
+    }
+
+    [data-theme="light"] .video-preview {
+      background: #f9fafb;
+    }
+
+    .video-preview video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    .video-controls {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .video-gallery {
+      margin-top: 6px;
+      max-height: 190px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      padding: 4px;
+    }
+
+    [data-theme="light"] .video-gallery {
+      background: #f9fafb;
+    }
+
+    .video-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 5px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.74rem;
+      margin-bottom: 4px;
+    }
+
+    .video-meta span {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Accountability */
+    .buddy-list {
+      margin-top: 4px;
+      max-height: 140px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #020617;
+      padding: 4px;
+    }
+
+    [data-theme="light"] .buddy-list {
+      background: #f9fafb;
+    }
+
+    .buddy-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 5px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+    }
+
+    .buddy-row:nth-child(odd) {
+      background: rgba(15,23,42,0.9);
+    }
+
+    [data-theme="light"] .buddy-row:nth-child(odd) {
+      background: #ffffff;
+    }
+
+    .buddy-row strong {
+      font-size: 0.78rem;
+    }
+
+    .rank-badge {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .rank-badge.gold {
+      border-color: #facc15;
+      color: #facc15;
+    }
+
+    .rank-badge.silver {
+      border-color: #e5e7eb;
+      color: #e5e7eb;
+    }
+
+    .rank-badge.bronze {
+      border-color: #fb923c;
+      color: #fec89a;
+    }
+
+    .buddy-input-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 3px;
+    }
+
+    .buddy-input-row input {
+      flex: 1;
+      min-width: 0;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.74rem;
+      padding: 4px 8px;
+    }
+
+    [data-theme="light"] .buddy-input-row input {
+      background: #f9fafb;
+    }
+
+    .challenge-text {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .challenge-text strong {
+      color: var(--accent-strong);
+    }
+
+    /* Footer */
+    .footer {
+      grid-column: 1 / -1;
+      padding: 8px 10px 10px;
+      border-top: 1px solid rgba(15,23,42,0.9);
+      background: #020617;
+      font-size: 0.72rem;
+      color: var(--text-muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
     }
 
-    .pill {
+    [data-theme="light"] .footer {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .footer-pill {
       padding: 3px 7px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.5);
+      border: 1px solid var(--border-subtle);
     }
 
     .reset-btn {
-      background: none;
       border: none;
-      color: rgba(248,113,113,0.9);
+      background: none;
+      color: var(--danger);
       font-size: 0.7rem;
       cursor: pointer;
       text-decoration: underline dotted;
       text-underline-offset: 3px;
     }
 
-    .reset-btn:hover {
-      color: var(--danger);
-    }
+    .reset-btn:hover { opacity: 0.9; }
 
-    /* Onboarding overlay */
-    .onboarding-overlay {
+    /* Onboarding */
+    .onboard-overlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at top, rgba(15,23,42,0.96), rgba(2,6,23,0.98));
-      display: flex;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.95), rgba(2,6,23,0.98));
+      display: none;
       align-items: center;
       justify-content: center;
-      z-index: 999;
+      z-index: 50;
     }
 
-    .onboarding-card {
+    .onboard-card {
       width: 100%;
       max-width: 380px;
-      margin: 16px;
+      margin: 14px;
+      border-radius: 18px;
       background: #020617;
-      border-radius: 20px;
-      border: 1px solid rgba(148,163,184,0.3);
-      box-shadow: 0 24px 50px rgba(0,0,0,0.8);
-      padding: 16px 16px 14px;
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 14px 14px 12px;
+      box-shadow: 0 22px 50px rgba(0,0,0,0.8);
+      font-size: 0.88rem;
     }
 
-    .onboarding-tag {
-      font-size: 0.75rem;
+    .onboard-tag {
+      font-size: 0.74rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.13em;
       color: var(--accent);
-      margin-bottom: 6px;
-    }
-
-    .onboarding-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .onboarding-body {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .onboarding-list {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .onboarding-list li {
-      margin-left: 16px;
       margin-bottom: 4px;
     }
 
-    .onboarding-footer {
+    .onboard-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .onboard-body {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .onboard-list {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-left: 14px;
+      margin-bottom: 10px;
+    }
+
+    .onboard-list li { margin-bottom: 3px; }
+
+    .onboard-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-top: 6px;
+      gap: 6px;
+      margin-top: 2px;
     }
 
-    .onboarding-dots {
+    .onboard-dots {
       display: flex;
       gap: 4px;
       align-items: center;
     }
 
-    .onboarding-dot {
+    .onboard-dot {
       width: 7px;
       height: 7px;
       border-radius: 999px;
       background: rgba(75,85,99,0.9);
     }
 
-    .onboarding-dot.active {
-      width: 14px;
+    .onboard-dot.active {
+      width: 13px;
       background: var(--accent);
     }
 
-    .onboarding-btn {
+    .onboard-btn {
       border-radius: 999px;
       border: none;
-      padding: 7px 14px;
-      font-size: 0.86rem;
+      padding: 6px 14px;
+      font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
       background: var(--accent-soft);
       color: var(--accent);
-      white-space: nowrap;
-      box-shadow: 0 10px 24px rgba(34,197,94,0.4);
+      box-shadow: 0 12px 24px rgba(34,197,94,0.5);
     }
 
-    .onboarding-skip {
+    .onboard-skip {
       border: none;
       background: none;
+      font-size: 0.72rem;
       color: var(--text-muted);
-      font-size: 0.74rem;
       cursor: pointer;
       text-decoration: underline dotted;
       text-underline-offset: 3px;
     }
 
-    @media (max-width: 480px) {
-      body {
-        padding: 12px 8px 18px;
-      }
-      .app {
-        border-radius: 16px;
-      }
-      .title {
-        font-size: 1.15rem;
-      }
-      .stats-row {
-        flex-wrap: wrap;
-      }
+    @media (max-width: 900px) {
+      body { padding: 12px 6px 18px; }
+      .app { border-radius: 18px; }
+      .title { font-size: 1.15rem; }
+      .stats-row { gap: 6px; }
     }
   </style>
 </head>
 <body>
-  <!-- Onboarding overlay -->
-  <div class="onboarding-overlay" id="onboardingOverlay" style="display:none;">
-    <div class="onboarding-card">
-      <div class="onboarding-tag">Welcome to Atomic Wins</div>
-      <div class="onboarding-title" id="onboardingTitle"></div>
-      <div class="onboarding-body" id="onboardingBody"></div>
-      <ul class="onboarding-list" id="onboardingList"></ul>
-      <div class="onboarding-footer">
-        <button class="onboarding-skip" id="onboardingSkip">Skip</button>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="onboarding-dots">
-            <div class="onboarding-dot" data-step="0"></div>
-            <div class="onboarding-dot" data-step="1"></div>
-            <div class="onboarding-dot" data-step="2"></div>
+  <!-- Onboarding -->
+  <div class="onboard-overlay" id="onboardOverlay">
+    <div class="onboard-card">
+      <div class="onboard-tag">Atomic Wins</div>
+      <div class="onboard-title" id="onboardTitle"></div>
+      <div class="onboard-body" id="onboardBody"></div>
+      <ul class="onboard-list" id="onboardList"></ul>
+      <div class="onboard-footer">
+        <button class="onboard-skip" id="onboardSkip">Skip</button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="onboard-dots">
+            <div class="onboard-dot" data-step="0"></div>
+            <div class="onboard-dot" data-step="1"></div>
+            <div class="onboard-dot" data-step="2"></div>
           </div>
-          <button class="onboarding-btn" id="onboardingNext">Next</button>
+          <button class="onboard-btn" id="onboardNext">Next</button>
         </div>
       </div>
     </div>
   </div>
 
   <div class="app">
+    <!-- HEADER -->
     <header class="app-header">
-      <div class="title-row">
-        <div>
-          <div class="title">
-            ⚡ Atomic Wins
-            <span class="title-badge">Micro Achievements</span>
+      <div class="header-main">
+        <div class="header-row">
+          <div class="title-block">
+            <div class="title">
+              ⚡ Atomic Wins
+            </div>
+            <span class="badge-main">Brutal Accountability</span>
           </div>
-          <div class="subtitle" id="subtitleText">
-            Turn tiny actions into daily momentum.
+
+          <label class="theme-toggle">
+            <input type="checkbox" id="themeToggle" />
+            <span>Dark mode</span>
+          </label>
+        </div>
+        <div class="subtitle" id="subtitleText">
+          Tiny wins, ruthless consistency. No more “tomorrow”.
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="ring" id="streakRing" style="--p:0;">
+              <span class="ring-inner" id="streakRingInner">0</span>
+            </div>
+            <div class="stat-main">
+              <div class="stat-label">Streak</div>
+              <div class="stat-value">
+                <span id="streakValue">0</span>
+                <span class="stat-suffix">days</span>
+              </div>
+              <div class="stat-tag" id="streakTag">No streak yet. Start today.</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="ring" id="effortRing" style="--p:0;">
+              <span class="ring-inner" id="effortRingInner">0</span>
+            </div>
+            <div class="stat-main">
+              <div class="stat-label">Effort score</div>
+              <div class="stat-value">
+                <span id="effortScore">0</span>
+                <span class="stat-suffix">/ 100</span>
+              </div>
+              <div class="stat-tag" id="effortTag">Do one microscopic win.</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="ring" id="consistencyRing" style="--p:0;">
+              <span class="ring-inner" id="consistencyRingInner">0%</span>
+            </div>
+            <div class="stat-main">
+              <div class="stat-label">Consistency</div>
+              <div class="stat-value">
+                <span id="consistencyValue">0</span>
+                <span class="stat-suffix">/ 7 days</span>
+              </div>
+              <div class="stat-tag" id="consistencyTag">We track the follow-through.</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="ring" id="reminderRing" style="--p:0;">
+              <span class="ring-inner" id="reminderRingInner">--</span>
+            </div>
+            <div class="stat-main">
+              <div class="stat-label">Next brutal ping</div>
+              <div class="stat-value">
+                <span id="reminderCountdown">--:--</span>
+              </div>
+              <div class="stat-tag warning" id="reminderTag">
+                Opt-in required. This app will call you out (respectfully).
+              </div>
+            </div>
           </div>
         </div>
-        <div class="date-chip-wrap">
-          <div class="date-chip" id="dateChip"></div>
-          <div class="track-chip" id="trackChip">
-            <span class="emoji">⚡</span><span id="trackChipLabel">General Momentum</span>
-          </div>
-        </div>
+
+        <div class="feedback" id="feedbackMessage"></div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Streak</div>
-          <div class="stat-value">
-            <span id="streakValue">0</span>
-            <span class="stat-suffix">days</span>
-          </div>
-          <div class="stat-tag" id="streakTag">No streak yet. Start today.</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Today</div>
-          <div class="stat-value">
-            <span id="todayWins">0</span>
-            <span class="stat-suffix">wins</span>
-          </div>
-          <div class="stat-tag" id="todayTag">Tap one tiny win to begin.</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">All Time</div>
-          <div class="stat-value">
-            <span id="totalWins">0</span>
-            <span class="stat-suffix">wins</span>
-          </div>
-          <div class="stat-tag">Compounds quietly.</div>
+      <div class="header-secondary">
+        <div class="chip-date" id="dateChip"></div>
+        <div class="chip-track">
+          <span id="trackEmoji">⚡</span>
+          <span id="trackLabel">General Momentum</span>
         </div>
       </div>
-
-      <div class="feedback" id="feedbackMessage"></div>
     </header>
 
-    <main class="content">
+    <!-- LEFT COLUMN -->
+    <main class="col-main">
       <div class="hint">
-        These are intentionally <strong>tiny</strong> — 10–60 seconds each.
-        Pick any one, do it quickly, tap <em>mark as done</em>. That’s a win.
+        These wins are intentionally tiny – 10–60 seconds. Pick one, do it quickly, tap <strong>“Mark as done”</strong>. That’s a win.
       </div>
 
-      <!-- Track selector -->
-      <section class="tracks-box">
-        <div class="tracks-title">Choose your track</div>
+      <!-- Tracks -->
+      <section class="section-card">
+        <div class="section-title">
+          <span>Tracks & templates</span>
+          <span class="section-sub">
+            General · Calm · Focus · Energy · Tidy · Social · <strong>Real Estate · Fitness · Coding · Business · School</strong>
+          </span>
+        </div>
         <div class="tracks-list" id="tracksList"></div>
       </section>
 
-      <!-- Focus / pinned tasks -->
+      <!-- Micro-goals -->
+      <section class="section-card">
+        <div class="section-title">
+          <span>Daily micro-goals</span>
+          <span id="microGoalsSummary" class="section-sub">0 / 3 completed</span>
+        </div>
+        <div id="microGoalsContainer"></div>
+        <div class="micro-summary">
+          Think <strong>ridiculously small</strong> – “DM 1 lead”, “10 squats”, “write 3 lines of code”. Brutal mode will notice if you ghost these.
+        </div>
+      </section>
+
+      <!-- Focus / pinned -->
       <section class="focus-section" id="focusSection" style="display:none;">
         <div class="focus-header">
-          <div class="focus-title">
-            ⭐ Focus quests
-          </div>
-          <div class="focus-subtitle">
-            Your starred tiny wins for today.
-          </div>
+          <div class="focus-title">⭐ Focus quests</div>
+          <div class="focus-sub">Your pinned non-negotiables for today.</div>
         </div>
         <div class="focus-list" id="focusContainer"></div>
       </section>
 
-      <!-- History: last 7 days -->
-      <section class="history" id="historySection">
-        <div class="history-header">
-          <div class="history-title">Last 7 days</div>
-          <div class="history-subtitle" id="historySubtitle"></div>
+      <!-- History -->
+      <section class="section-card">
+        <div class="section-title">
+          <span>Last 7 days</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="pill-toggle" id="historyViewToggle">Calendar</button>
+            <span class="section-sub" id="historySubtitle"></span>
+          </div>
         </div>
         <div class="history-grid" id="historyGrid"></div>
-        <div class="weekly-summary" id="weeklySummary"></div>
+        <div class="calendar-grid" id="calendarGrid" style="display:none;"></div>
+        <div class="history-summary" id="historySummary"></div>
       </section>
 
+      <!-- Tasks -->
       <section class="tasks" id="tasksContainer"></section>
 
-      <!-- Custom task creator -->
-      <section class="custom-box">
-        <div class="custom-title">Add your own tiny win</div>
-        <div class="custom-row">
-          <div class="input-row">
-            <input
-              id="customTitleInput"
-              class="custom-input"
-              type="text"
-              maxlength="60"
-              placeholder="e.g. Send 1 kind message"
-            />
-            <input
-              id="customTagInput"
-              class="custom-input"
-              type="text"
-              maxlength="24"
-              placeholder="e.g. 30 seconds"
-            />
-            <button id="customAddBtn" class="custom-add-btn">Add</button>
-          </div>
-          <div class="custom-hint">
-            Custom quests are saved per track. Keep them small and repeatable.
-          </div>
+      <!-- Custom tiny win -->
+      <section class="section-card">
+        <div class="section-title">Custom tiny win</div>
+        <div class="input-row">
+          <input id="customTitleInput" class="input-pill" type="text" maxlength="60"
+                 placeholder="DM 1 lead · 10 push-ups · refactor 1 function…" />
+          <input id="customTagInput" class="input-pill" type="text" maxlength="24"
+                 placeholder="~30 seconds" />
+        </div>
+        <button class="btn btn-ghost btn-small" id="customAddBtn">Add to this track</button>
+        <div class="reflection-hint">
+          Custom quests are saved per track. Keep them stupid-small and repeatable.
         </div>
       </section>
 
       <!-- Reflection -->
-      <section class="reflection-box">
-        <div class="reflection-title">After today’s wins, I feel…</div>
-        <textarea
-          id="reflectionInput"
-          class="reflection-input"
-          maxlength="120"
-          placeholder="e.g. a little calmer · less stuck · more in control"
-        ></textarea>
+      <section class="section-card">
+        <div class="section-title">After today’s wins, I feel…</div>
+        <textarea id="reflectionInput" class="reflection-input"
+                  maxlength="120"
+                  placeholder="sharper · calmer · more like the person I said I’d be"></textarea>
         <div class="reflection-hint">
-          Just a word or short phrase. This shows up in your weekly summary.
+          Just a word or short phrase. Shows up in your analytics & “effort score”.
         </div>
       </section>
+    </main>
 
-      <!-- Settings -->
-      <section class="settings-box">
-        <div class="settings-title">
-          ⚙️ Player settings
+    <!-- RIGHT COLUMN -->
+    <aside class="col-side">
+      <!-- Brutal honesty -->
+      <section class="panel">
+        <div class="panel-title">
+          🧨 Brutal Honesty System
+          <span class="panel-badge">Opt-in</span>
         </div>
         <div class="settings-row">
           <div class="settings-item">
             <div class="settings-label">
-              Streak forgiveness
-              <div style="font-size:0.68rem;color:var(--text-muted);">
-                Missing 1 day softens your streak instead of killing it.
-              </div>
+              Brutal honesty
+              <small>24h inactivity resets streak; feedback gets sharper.</small>
             </div>
             <div class="settings-control">
-              <input type="checkbox" id="settingForgiveness" class="settings-checkbox" />
-              <label for="settingForgiveness" style="font-size:0.74rem;">On</label>
+              <input type="checkbox" id="settingBrutalEnabled" class="settings-checkbox">
+              <label for="settingBrutalEnabled" style="font-size:0.72rem;">On</label>
             </div>
           </div>
+
           <div class="settings-item">
             <div class="settings-label">
-              Max focus quests
-              <div style="font-size:0.68rem;color:var(--text-muted);">
-                How many ⭐ cards you can pin at once.
-              </div>
+              Brutal level
+              <small>Soft · Hard · Relentless.</small>
             </div>
             <div class="settings-control">
-              <select id="settingMaxPinned" class="settings-select">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3 (default)</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
+              <select id="settingBrutalLevel" class="select-pill">
+                <option value="soft">Soft Brutal</option>
+                <option value="hard">Hard Brutal</option>
+                <option value="relentless">Relentless Brutal</option>
               </select>
             </div>
           </div>
+
           <div class="settings-item">
             <div class="settings-label">
-              Tone of feedback
-              <div style="font-size:0.68rem;color:var(--text-muted);">
-                Choose how the app talks to you.
-              </div>
+              3 daily brutal pings
+              <small>Local notifications. No server, no tracking.</small>
             </div>
             <div class="settings-control">
-              <select id="settingTone" class="settings-select">
+              <input type="checkbox" id="settingRemindersEnabled" class="settings-checkbox">
+              <label for="settingRemindersEnabled" style="font-size:0.72rem;">On</label>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:5px;font-size:0.72rem;">Schedule (local time):</div>
+        <div id="reminderConfigContainer"></div>
+        <div style="margin-top:5px;font-size:0.72rem;">
+          Brutal messages use your streak, micro-goals & missed days as input. Mental health mode softens the edges.
+        </div>
+      </section>
+
+      <!-- Player / effort / privacy toggles -->
+      <section class="panel">
+        <div class="panel-title">⚙️ Player profile</div>
+        <div class="settings-row">
+          <div class="settings-item">
+            <div class="settings-label">
+              Streak forgiveness
+              <small>Missing 1 day dents the streak instead of nuking it (when brutal is off).</small>
+            </div>
+            <div class="settings-control">
+              <input type="checkbox" id="settingForgiveness" class="settings-checkbox">
+              <label for="settingForgiveness" style="font-size:0.72rem;">On</label>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              Max focus quests
+              <small>How many ⭐ cards you can pin at once.</small>
+            </div>
+            <div class="settings-control">
+              <select id="settingMaxPinned" class="select-pill">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              Feedback tone
+              <small>For non-brutal messages.</small>
+            </div>
+            <div class="settings-control">
+              <select id="settingTone" class="select-pill">
                 <option value="encouraging">Encouraging</option>
                 <option value="gentle">Gentle</option>
                 <option value="hype">Hype</option>
               </select>
             </div>
           </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              Mental health mode
+              <small>Reduces harshness when you’re already overloaded.</small>
+            </div>
+            <div class="settings-control">
+              <input type="checkbox" id="settingMentalHealth" class="settings-checkbox">
+              <label for="settingMentalHealth" style="font-size:0.72rem;">On</label>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              Auto-post prompts
+              <small>Random “share this win” prompts (never auto-posts).</small>
+            </div>
+            <div class="settings-control">
+              <input type="checkbox" id="settingAutoPost" class="settings-checkbox">
+              <label for="settingAutoPost" style="font-size:0.72rem;">Prompt-only</label>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              Storage mode
+              <small>Local-only · or export/import JSON for your own cloud.</small>
+            </div>
+            <div class="settings-control">
+              <select id="settingStorageMode" class="select-pill">
+                <option value="local">Local device only</option>
+                <option value="manual-cloud">Local + manual cloud sync</option>
+              </select>
+            </div>
+          </div>
         </div>
       </section>
-    </main>
 
+      <!-- Analytics -->
+      <section class="panel">
+        <div class="panel-title">
+          📊 Analytics & patterns
+          <span class="panel-badge">AI-style</span>
+        </div>
+        <div class="analytics-chart">
+          <canvas id="activityChart" width="360" height="115"></canvas>
+        </div>
+        <div class="analytics-meta" id="analyticsMeta">
+          Log a few wins and I’ll surface patterns & top-performer comparisons.
+        </div>
+      </section>
+
+      <!-- Video -->
+      <section class="panel">
+        <div class="panel-title">🎥 Video wins & highlight reel</div>
+        <div style="font-size:0.74rem;">
+          Hit record when you complete a win. Clips stay on this device (IndexedDB). Weekly highlight = auto playlist with your proof.
+        </div>
+        <div class="video-preview">
+          <video id="videoPreview" playsinline muted></video>
+          <div class="video-controls">
+            <button class="btn btn-primary" id="btnStartRecording">Record win</button>
+            <button class="btn btn-danger btn-small" id="btnStopRecording" disabled>Stop & save</button>
+            <button class="btn btn-ghost btn-small" id="btnPlayWeekly" disabled>Weekly highlight</button>
+          </div>
+        </div>
+        <div class="video-gallery" id="videoGallery"></div>
+        <div class="video-controls" style="margin-top:4px;">
+          <button class="btn btn-ghost btn-small" id="btnRandomShare" disabled>Random share prompt</button>
+        </div>
+        <div style="margin-top:4px;font-size:0.7rem;color:var(--text-muted);">
+          Export clips and upload manually to TikTok / IG Reels / YT Shorts.
+        </div>
+      </section>
+
+      <!-- Accountability -->
+      <section class="panel">
+        <div class="panel-title">🤝 Accountability squad</div>
+        <div style="font-size:0.74rem;">
+          Add buddies and track effort scores locally. Leaderboard never leaves this browser.
+        </div>
+        <div class="buddy-input-row">
+          <input id="buddyNameInput" placeholder="Add accountability buddy (name or handle)" />
+          <button class="btn btn-primary btn-small" id="buddyAddBtn">Add</button>
+        </div>
+        <div class="buddy-list" id="buddyList"></div>
+        <div class="challenge-text">
+          Weekly challenge: <strong id="weeklyChallengeText"></strong>
+        </div>
+      </section>
+
+      <!-- Privacy / export -->
+      <section class="panel">
+        <div class="panel-title">🔒 Privacy & data</div>
+        <div style="font-size:0.74rem;margin-bottom:4px;">
+          All data & videos live on this device. “Manual cloud” lets you export/import JSON to your own storage.
+        </div>
+        <div class="video-controls">
+          <button class="btn btn-ghost btn-small" id="btnExportState">Export JSON</button>
+          <button class="btn btn-ghost btn-small" id="btnImportState">Import JSON</button>
+        </div>
+      </section>
+    </aside>
+
+    <!-- FOOTER -->
     <footer class="footer">
-      <div class="pill">
-        Local only · Your data stays in this browser.
+      <div class="footer-pill">
+        PWA-ready · LocalStorage + IndexedDB · Brutal mode optional & mental-health aware.
       </div>
-      <button class="reset-btn" id="resetButton" title="Clear all stats and tasks and start over">
-        reset all
-      </button>
+      <button class="reset-btn" id="resetButton">reset everything</button>
     </footer>
   </div>
 
   <script>
-    // ---------- TRACKS & DEFAULT TASKS ----------
+    /****************************************************************
+     * Core constants / storage keys
+     ****************************************************************/
+    const STORAGE_STATE_KEY = 'atomicWins_state_v7';
+    const STORAGE_SETTINGS_KEY = 'atomicWins_settings_v3';
+    const STORAGE_TRACK_KEY = 'atomicWins_track_v3';
+    const STORAGE_THEME_KEY = 'atomicWins_theme_v2';
+    const STORAGE_ONBOARD_KEY = 'atomicWins_onboard_v1';
+    const STORAGE_CUSTOM_TASK_BASE = 'atomicWins_customTasks_';
+    const STORAGE_PINNED_BASE = 'atomicWins_pinned_';
+    const STORAGE_MICRO_GOALS_KEY = 'atomicWins_microGoals_v1';
+    const STORAGE_BRUTAL_KEY = 'atomicWins_brutal_v1';
+    const STORAGE_BUDDIES_KEY = 'atomicWins_buddies_v1';
+    const STORAGE_ACCOUNTABILITY_KEY = 'atomicWins_accountability_v1';
+
+    const MICRO_GOALS_PER_DAY = 3;
+    const DEFAULT_BRUTAL_CONFIG = {
+      times: ['13:00', '17:00', '20:00'],
+      messages: [
+        '1 PM check-in: have you done even one tiny win yet?',
+        '5 PM: future you is hoping you log at least one real action.',
+        '8 PM: the day is almost over. Either you log a win or today is just talk.'
+      ],
+      lastFired: {} // dateKey => { index: timestamp }
+    };
+
+    const DEFAULT_SETTINGS = {
+      streakForgiveness: true,
+      maxPinned: 3,
+      tone: 'encouraging',
+      brutalEnabled: false,
+      brutalLevel: 'soft',
+      remindersEnabled: false,
+      mentalHealthMode: false,
+      autoPostPrompts: false,
+      storageMode: 'local'
+    };
+
+    /****************************************************************
+     * Track templates – including Real Estate, Fitness, Coding,
+     * Business, School
+     ****************************************************************/
     const TRACKS = [
       {
         id: 'general',
         name: 'General',
         label: 'General Momentum',
         emoji: '⚡',
-        description: 'A bit of everything.',
+        desc: 'Tiny wins that fit any day.',
         tasks: [
-          {
-            id: 'gen-deep-breaths',
-            emoji: '🌬️',
-            title: 'Take 3 deep breaths',
-            description: 'Inhale slowly through your nose, exhale through your mouth.',
-            tag: '10 seconds'
-          },
-          {
-            id: 'gen-water-sips',
-            emoji: '💧',
-            title: 'Drink a few sips of water',
-            description: 'Just enough to remind your body you care.',
-            tag: '15 seconds'
-          },
-          {
-            id: 'gen-stand-stretch',
-            emoji: '🧍‍♂️',
-            title: 'Stand up & stretch',
-            description: 'Neck, shoulders, back. Shake out the stiffness.',
-            tag: '20 seconds'
-          },
-          {
-            id: 'gen-one-thing',
-            emoji: '📝',
-            title: 'Write one tiny thing',
-            description: 'Jot down a thought, idea, or gratitude.',
-            tag: '30 seconds'
-          },
-          {
-            id: 'gen-look-away',
-            emoji: '👀',
-            title: 'Look away from screens',
-            description: 'Gaze at something 20+ feet away to reset your eyes.',
-            tag: '20 seconds'
-          },
-          {
-            id: 'gen-tidy-spot',
-            emoji: '🧹',
-            title: 'Tidy one small spot',
-            description: 'Desk corner, nightstand, or one shelf – only one.',
-            tag: '45 seconds'
-          }
+          { id: 'gen-breath', emoji: '🌬️', title: '3 deep breaths', tag: '10 sec', desc: 'In through nose, out through mouth.' },
+          { id: 'gen-water', emoji: '💧', title: 'Drink some water', tag: '15 sec', desc: 'A few sips is enough.' },
+          { id: 'gen-stand', emoji: '🧍‍♂️', title: 'Stand & stretch', tag: '30 sec', desc: 'Neck, shoulders, back.' },
+          { id: 'gen-note', emoji: '📝', title: 'Write 1 line', tag: '30 sec', desc: 'Thought, idea, or gratitude.' }
         ]
       },
       {
@@ -1105,43 +1678,11 @@
         name: 'Calm',
         label: 'Calm Nervous System',
         emoji: '🧘',
-        description: 'For anxious, overstimulated days.',
+        desc: 'For anxious / overstimulated days.',
         tasks: [
-          {
-            id: 'calm-box-breath',
-            emoji: '📦',
-            title: 'Do 4 box breaths',
-            description: 'Inhale 4, hold 4, exhale 4, hold 4.',
-            tag: '40 seconds'
-          },
-          {
-            id: 'calm-body-scan',
-            emoji: '🧠',
-            title: 'Mini body scan',
-            description: 'Notice your jaw, shoulders, belly, hands.',
-            tag: '45 seconds'
-          },
-          {
-            id: 'calm-sip-water',
-            emoji: '💧',
-            title: 'Sip water slowly',
-            description: 'Three slow sips, pay attention to the feeling.',
-            tag: '20 seconds'
-          },
-          {
-            id: 'calm-window',
-            emoji: '🌥️',
-            title: 'Look out a window',
-            description: 'Just watch the sky or anything not a screen.',
-            tag: '30 seconds'
-          },
-          {
-            id: 'calm-shoulders',
-            emoji: '💆‍♂️',
-            title: 'Unclench shoulders',
-            description: 'Roll them gently forward and back.',
-            tag: '25 seconds'
-          }
+          { id: 'calm-box', emoji: '📦', title: '4 box breaths', tag: '40 sec', desc: 'In 4 · hold 4 · out 4 · hold 4.' },
+          { id: 'calm-body', emoji: '🧠', title: 'Mini body scan', tag: '45 sec', desc: 'Jaw, shoulders, stomach, hands.' },
+          { id: 'calm-window', emoji: '🌤️', title: 'Look out a window', tag: '30 sec', desc: 'No phone. Just outside.' }
         ]
       },
       {
@@ -1149,36 +1690,11 @@
         name: 'Focus',
         label: 'Laser Focus',
         emoji: '🎯',
-        description: 'For scattered or ADHD-ish days.',
+        desc: 'For scattered, tab-heavy days.',
         tasks: [
-          {
-            id: 'focus-single-task',
-            emoji: '🎯',
-            title: 'Choose one tiny task',
-            description: 'Decide the next thing you’ll do for 60 seconds.',
-            tag: '20 seconds'
-          },
-          {
-            id: 'focus-notifications',
-            emoji: '🔕',
-            title: 'Mute one distraction',
-            description: 'Silence a chat, close a tab, or pause notifications.',
-            tag: '25 seconds'
-          },
-          {
-            id: 'focus-timer',
-            emoji: '⏱️',
-            title: 'Set a 3-min timer',
-            description: 'Commit to 3 focused minutes on one thing.',
-            tag: '30 seconds'
-          },
-          {
-            id: 'focus-desk',
-            emoji: '🧹',
-            title: 'Clear 1 square foot',
-            description: 'Make a tiny “focus island” of clear space.',
-            tag: '45 seconds'
-          }
+          { id: 'focus-next', emoji: '🎯', title: 'Pick one next action', tag: '20 sec', desc: 'Decide exactly what to do for 60 seconds.' },
+          { id: 'focus-notif', emoji: '🔕', title: 'Mute a distraction', tag: '20 sec', desc: 'One chat / app off for 15 minutes.' },
+          { id: 'focus-timer', emoji: '⏱️', title: 'Set 3-min timer', tag: '30 sec', desc: 'Focus on one task until it rings.' }
         ]
       },
       {
@@ -1186,73 +1702,23 @@
         name: 'Energy',
         label: 'Energy Boost',
         emoji: '⚡',
-        description: 'When you feel sluggish or foggy.',
+        desc: 'When you feel sluggish.',
         tasks: [
-          {
-            id: 'energy-stand',
-            emoji: '🧍',
-            title: 'Stand up & shake',
-            description: 'Shake arms and legs for a few seconds.',
-            tag: '20 seconds'
-          },
-          {
-            id: 'energy-steps',
-            emoji: '🚶‍♂️',
-            title: 'Take 20 steps',
-            description: 'Walk around your room or hallway.',
-            tag: '30 seconds'
-          },
-          {
-            id: 'energy-cold-water',
-            emoji: '🚰',
-            title: 'Splash cool water',
-            description: 'On your face or wrists for a quick jolt.',
-            tag: '25 seconds'
-          },
-          {
-            id: 'energy-stretch',
-            emoji: '🤸‍♂️',
-            title: 'Quick stretch combo',
-            description: 'Reach up, fold forward, roll back up.',
-            tag: '35 seconds'
-          }
+          { id: 'eng-shake', emoji: '🤸‍♂️', title: 'Shake it out', tag: '20 sec', desc: 'Shake arms & legs, wake the body.' },
+          { id: 'eng-steps', emoji: '🚶', title: 'Walk 50 steps', tag: '1 min', desc: 'Around room, hallway, or outside.' },
+          { id: 'eng-water', emoji: '🚰', title: 'Splash water', tag: '20 sec', desc: 'On face or wrists for a reset.' }
         ]
       },
       {
         id: 'tidy',
         name: 'Tidy',
         label: 'Clear Space',
-        emoji: '🧽',
-        description: 'For visual chaos & messy rooms.',
+        emoji: '🧹',
+        desc: 'For physical chaos.',
         tasks: [
-          {
-            id: 'tidy-surface',
-            emoji: '🧼',
-            title: 'Wipe one surface',
-            description: 'Desk corner, nightstand, counter.',
-            tag: '45 seconds'
-          },
-          {
-            id: 'tidy-trash',
-            emoji: '🗑️',
-            title: 'Find 3 things to toss',
-            description: 'Scraps, packaging, old receipts.',
-            tag: '40 seconds'
-          },
-          {
-            id: 'tidy-clothes',
-            emoji: '👕',
-            title: 'Hang or fold 3 items',
-            description: 'No more than 3. That’s enough.',
-            tag: '35 seconds'
-          },
-          {
-            id: 'tidy-entry',
-            emoji: '🚪',
-            title: 'Reset the entry spot',
-            description: 'Shoes, keys, whatever piles up by the door.',
-            tag: '50 seconds'
-          }
+          { id: 'tidy-surface', emoji: '🧼', title: 'Clear 1 small surface', tag: '45 sec', desc: 'Desk corner, table, nightstand.' },
+          { id: 'tidy-trash', emoji: '🗑️', title: 'Trash 3 items', tag: '40 sec', desc: 'Paper, packaging, junk.' },
+          { id: 'tidy-clothes', emoji: '👕', title: 'Fold or hang 3 items', tag: '45 sec', desc: 'Nothing more required.' }
         ]
       },
       {
@@ -1260,55 +1726,78 @@
         name: 'Social',
         label: 'Connection',
         emoji: '❤️',
-        description: 'For feeling lonely or disconnected.',
+        desc: 'For lonely / disconnected days.',
         tasks: [
-          {
-            id: 'social-check-in',
-            emoji: '💌',
-            title: 'Send a 1-line check-in',
-            description: '“Thinking of you” is enough.',
-            tag: '30 seconds'
-          },
-          {
-            id: 'social-react',
-            emoji: '👍',
-            title: 'React to a friend’s post',
-            description: 'Something genuine, not just a like.',
-            tag: '25 seconds'
-          },
-          {
-            id: 'social-thank-you',
-            emoji: '🙏',
-            title: 'Thank someone in one sentence',
-            description: 'Text, DM, or a note.',
-            tag: '40 seconds'
-          },
-          {
-            id: 'social-eye-contact',
-            emoji: '👀',
-            title: 'Practice kind eye contact',
-            description: 'Imagine looking at someone with warmth.',
-            tag: '20 seconds'
-          }
+          { id: 'soc-checkin', emoji: '💌', title: 'Send 1 check-in', tag: '40 sec', desc: '“Thinking of you” counts.' },
+          { id: 'soc-react', emoji: '👍', title: 'React genuinely', tag: '20 sec', desc: 'Comment something real, not just a like.' }
+        ]
+      },
+      {
+        id: 'realestate',
+        name: 'Real Estate',
+        label: 'Real Estate Hustle',
+        emoji: '🏡',
+        desc: 'Micro-moves that move deals.',
+        tasks: [
+          { id: 're-dm', emoji: '📨', title: 'DM 1 warm lead', tag: '45 sec', desc: 'One clear “still interested?” message.' },
+          { id: 're-fsbo', emoji: '🔍', title: 'Scan 3 FSBO listings', tag: '1 min', desc: 'Save anything promising.' },
+          { id: 're-follow', emoji: '📞', title: 'Send 1 follow-up', tag: '30 sec', desc: 'Bump a conversation you care about.' }
+        ]
+      },
+      {
+        id: 'fitness',
+        name: 'Fitness',
+        label: 'Micro Fitness',
+        emoji: '🏋️‍♂️',
+        desc: 'Tiny moves > no moves.',
+        tasks: [
+          { id: 'fit-push', emoji: '💪', title: '10 push-ups', tag: '40 sec', desc: 'Wall / knee / full – all count.' },
+          { id: 'fit-squat', emoji: '🦵', title: '15 bodyweight squats', tag: '1 min', desc: 'Slow and controlled.' },
+          { id: 'fit-steps', emoji: '🚶‍♀️', title: '100 steps', tag: '2 min', desc: 'Anywhere. No treadmill needed.' }
+        ]
+      },
+      {
+        id: 'coding',
+        name: 'Coding',
+        label: 'Code Momentum',
+        emoji: '💻',
+        desc: 'Ship microscopic progress daily.',
+        tasks: [
+          { id: 'code-lint', emoji: '🧹', title: 'Fix 1 linter warning', tag: '2 min', desc: 'Clean up one tiny thing.' },
+          { id: 'code-read', emoji: '📖', title: 'Read 1 function', tag: '2 min', desc: 'Understand it, no editing required.' },
+          { id: 'code-todo', emoji: '📌', title: 'Write 1 TODO in code', tag: '1 min', desc: 'Name the next tiny step.' }
+        ]
+      },
+      {
+        id: 'business',
+        name: 'Business',
+        label: 'Business Builder',
+        emoji: '📈',
+        desc: 'Inputs that compound into revenue.',
+        tasks: [
+          { id: 'biz-prospect', emoji: '🤝', title: 'Ping 1 prospect', tag: '60 sec', desc: 'Cold or warm. Just one touchpoint.' },
+          { id: 'biz-metric', emoji: '📊', title: 'Check 1 metric', tag: '60 sec', desc: 'MRR, conversion, or a leading indicator.' },
+          { id: 'biz-idea', emoji: '💡', title: 'Write 1 tiny experiment', tag: '45 sec', desc: 'A/B test, outreach angle, funnel tweak.' }
+        ]
+      },
+      {
+        id: 'school',
+        name: 'School',
+        label: 'School / Study',
+        emoji: '📚',
+        desc: 'Students: micro-study > cram-study.',
+        tasks: [
+          { id: 'sch-cards', emoji: '🧠', title: '5 flashcards', tag: '2 min', desc: 'Any subject. Five reps.' },
+          { id: 'sch-page', emoji: '📖', title: 'Read 1 page', tag: '2 min', desc: 'One page only. No pressure.' },
+          { id: 'sch-outline', emoji: '📝', title: 'Outline 1 paragraph', tag: '2 min', desc: 'For essay / notes / project.' }
         ]
       }
     ];
 
-    const STORAGE_STATE_KEY = 'atomicWins_state_v5';
-    const STORAGE_SETTINGS_KEY = 'atomicWins_settings_v1';
-    const STORAGE_TRACK_KEY = 'atomicWins_track_v1';
-    const STORAGE_ONBOARDED_KEY = 'atomicWins_onboarded_v1';
-    const CUSTOM_TASKS_BASE_KEY = 'atomicWins_customTasks_v1_';
-    const PINNED_BASE_KEY = 'atomicWins_pinned_v2_';
-
-    const DEFAULT_SETTINGS = {
-      streakForgiveness: true,
-      maxPinned: 3,
-      tone: 'encouraging'
-    };
-
-    // ---------- UTILITIES ----------
-    function getTodayKey() {
+    /****************************************************************
+     * Utility
+     ****************************************************************/
+    function todayKey() {
       const d = new Date();
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -1316,836 +1805,1789 @@
       return `${y}-${m}-${day}`;
     }
 
-    function formatNiceDate(date = new Date()) {
-      return date.toLocaleDateString(undefined, {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-      });
-    }
-
-    function shortDayName(date) {
-      return date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2);
+    function dateKeyFor(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
     }
 
     function parseKeyToDate(key) {
       if (!key) return null;
-      const parts = key.split('-');
-      if (parts.length !== 3) return null;
-      const [y, m, d] = parts.map(Number);
-      return new Date(y, m - 1, d);
+      const [y,m,d] = key.split('-').map(Number);
+      return new Date(y, m-1, d);
     }
 
-    function diffDays(oldKey, newKey) {
-      const d1 = parseKeyToDate(oldKey);
-      const d2 = parseKeyToDate(newKey);
-      if (!d1 || !d2) return null;
-      const MS_PER_DAY = 24 * 60 * 60 * 1000;
-      const diff = (d2 - d1) / MS_PER_DAY;
+    function dayDiff(aKey, bKey) {
+      const a = parseKeyToDate(aKey);
+      const b = parseKeyToDate(bKey);
+      if (!a || !b) return null;
+      const diff = (b - a) / (24*60*60*1000);
       return Math.round(diff);
     }
 
-    function getTrackById(id) {
+    function niceDate(date = new Date()) {
+      return date.toLocaleDateString(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric'
+      });
+    }
+
+    function shortDow(date) {
+      return date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0,2);
+    }
+
+    function clamp(n, min, max) {
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function getTrack(id) {
       return TRACKS.find(t => t.id === id) || TRACKS[0];
     }
 
-    function getDefaultTasksForTrack(trackId) {
-      return getTrackById(trackId).tasks;
+    function getDefaultTasks(trackId) {
+      return getTrack(trackId).tasks;
     }
 
-    // ---------- STORAGE ----------
+    /****************************************************************
+     * Storage helpers
+     ****************************************************************/
+    function loadJSON(key, fallback) {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      try { return JSON.parse(raw); }
+      catch { return fallback; }
+    }
+
+    function saveJSON(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
     function loadState() {
-      const raw = localStorage.getItem(STORAGE_STATE_KEY);
-      if (!raw) {
-        return {
-          streak: 0,
-          lastActivityDate: null,
-          totalWins: 0,
-          completionsByDay: {},
-          reflectionsByDay: {}
-        };
-      }
-      try {
-        const parsed = JSON.parse(raw);
-        return {
-          streak: parsed.streak || 0,
-          lastActivityDate: parsed.lastActivityDate || null,
-          totalWins: parsed.totalWins || 0,
-          completionsByDay: parsed.completionsByDay || {},
-          reflectionsByDay: parsed.reflectionsByDay || {}
-        };
-      } catch {
-        return {
-          streak: 0,
-          lastActivityDate: null,
-          totalWins: 0,
-          completionsByDay: {},
-          reflectionsByDay: {}
-        };
-      }
+      const base = loadJSON(STORAGE_STATE_KEY, null);
+      return base || {
+        streak: 0,
+        lastActivityDate: null,
+        totalWins: 0,
+        completionsByDay: {},  // { dateKey: [taskId] }
+        reflectionsByDay: {}
+      };
     }
 
-    function saveState(state) {
-      localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state));
+    function saveState() {
+      saveJSON(STORAGE_STATE_KEY, state);
     }
 
     function loadSettings() {
-      const raw = localStorage.getItem(STORAGE_SETTINGS_KEY);
-      if (!raw) return { ...DEFAULT_SETTINGS };
-      try {
-        const parsed = JSON.parse(raw);
-        return {
-          streakForgiveness: typeof parsed.streakForgiveness === 'boolean'
-            ? parsed.streakForgiveness
-            : DEFAULT_SETTINGS.streakForgiveness,
-          maxPinned: parsed.maxPinned || DEFAULT_SETTINGS.maxPinned,
-          tone: parsed.tone || DEFAULT_SETTINGS.tone
-        };
-      } catch {
-        return { ...DEFAULT_SETTINGS };
-      }
+      const s = loadJSON(STORAGE_SETTINGS_KEY, null) || {};
+      return {
+        streakForgiveness: s.streakForgiveness ?? DEFAULT_SETTINGS.streakForgiveness,
+        maxPinned: s.maxPinned ?? DEFAULT_SETTINGS.maxPinned,
+        tone: s.tone || DEFAULT_SETTINGS.tone,
+        brutalEnabled: !!s.brutalEnabled,
+        brutalLevel: s.brutalLevel || DEFAULT_SETTINGS.brutalLevel,
+        remindersEnabled: !!s.remindersEnabled,
+        mentalHealthMode: !!s.mentalHealthMode,
+        autoPostPrompts: !!s.autoPostPrompts,
+        storageMode: s.storageMode || DEFAULT_SETTINGS.storageMode
+      };
     }
 
-    function saveSettings(settings) {
-      localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(settings));
+    function saveSettings() {
+      saveJSON(STORAGE_SETTINGS_KEY, settings);
     }
 
-    function loadSelectedTrackId() {
-      return localStorage.getItem(STORAGE_TRACK_KEY) || 'general';
+    function loadTheme() {
+      return localStorage.getItem(STORAGE_THEME_KEY) || 'dark';
     }
 
-    function saveSelectedTrackId(id) {
-      localStorage.setItem(STORAGE_TRACK_KEY, id);
+    function saveTheme(theme) {
+      localStorage.setItem(STORAGE_THEME_KEY, theme);
     }
 
     function loadCustomTasks(trackId) {
-      const raw = localStorage.getItem(CUSTOM_TASKS_BASE_KEY + trackId);
-      if (!raw) return [];
-      try {
-        const tasks = JSON.parse(raw);
-        return Array.isArray(tasks) ? tasks : [];
-      } catch {
-        return [];
-      }
+      return loadJSON(STORAGE_CUSTOM_TASK_BASE + trackId, []) || [];
     }
 
     function saveCustomTasks(trackId, tasks) {
-      localStorage.setItem(CUSTOM_TASKS_BASE_KEY + trackId, JSON.stringify(tasks));
+      saveJSON(STORAGE_CUSTOM_TASK_BASE + trackId, tasks);
     }
 
     function loadPinned(trackId) {
-      const raw = localStorage.getItem(PINNED_BASE_KEY + trackId);
-      if (!raw) return [];
-      try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+      return loadJSON(STORAGE_PINNED_BASE + trackId, []) || [];
     }
 
-    function savePinned(trackId, pinned) {
-      localStorage.setItem(PINNED_BASE_KEY + trackId, JSON.stringify(pinned));
+    function savePinned(trackId, arr) {
+      saveJSON(STORAGE_PINNED_BASE + trackId, arr);
+    }
+
+    function loadMicroGoals() {
+      return loadJSON(STORAGE_MICRO_GOALS_KEY, {}) || {};
+    }
+
+    function saveMicroGoals() {
+      saveJSON(STORAGE_MICRO_GOALS_KEY, microGoalsMap);
+    }
+
+    function loadBrutal() {
+      const b = loadJSON(STORAGE_BRUTAL_KEY, null) || {};
+      return {
+        times: Array.isArray(b.times) && b.times.length === 3 ? b.times : DEFAULT_BRUTAL_CONFIG.times.slice(),
+        messages: Array.isArray(b.messages) && b.messages.length === 3 ? b.messages : DEFAULT_BRUTAL_CONFIG.messages.slice(),
+        lastFired: b.lastFired || {}
+      };
+    }
+
+    function saveBrutal() {
+      saveJSON(STORAGE_BRUTAL_KEY, brutalConfig);
+    }
+
+    function loadBuddies() {
+      return loadJSON(STORAGE_BUDDIES_KEY, []) || [];
+    }
+
+    function saveBuddies() {
+      saveJSON(STORAGE_BUDDIES_KEY, buddies);
+    }
+
+    function loadAccountability() {
+      return loadJSON(STORAGE_ACCOUNTABILITY_KEY, {}) || {};
+    }
+
+    function saveAccountability() {
+      saveJSON(STORAGE_ACCOUNTABILITY_KEY, accountabilityMeta);
     }
 
     function hasOnboarded() {
-      return !!localStorage.getItem(STORAGE_ONBOARDED_KEY);
+      return localStorage.getItem(STORAGE_ONBOARD_KEY) === 'yes';
     }
 
     function setOnboarded() {
-      localStorage.setItem(STORAGE_ONBOARDED_KEY, 'yes');
+      localStorage.setItem(STORAGE_ONBOARD_KEY, 'yes');
     }
 
-    // ---------- APP STATE ----------
+    /****************************************************************
+     * App state
+     ****************************************************************/
     let state = loadState();
     let settings = loadSettings();
-    let currentTrackId = loadSelectedTrackId();
+    let brutalConfig = loadBrutal();
+    let microGoalsMap = loadMicroGoals();
+    let buddies = loadBuddies();
+    let accountabilityMeta = loadAccountability();
+    let currentTrackId = localStorage.getItem(STORAGE_TRACK_KEY) || 'general';
     let customTasks = loadCustomTasks(currentTrackId);
-    let tasks = [];
     let pinnedTaskIds = loadPinned(currentTrackId);
+    let taskList = [];
+    const today = todayKey();
 
-    const todayKey = getTodayKey();
+    let feedbackTimeoutId = null;
+    let brutalTimerId = null;
+    let analyticsWorker = null;
 
+    // video state
+    let mediaStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let currentVideoTagTitle = null;
+
+    /****************************************************************
+     * DOM refs
+     ****************************************************************/
     const dateChipEl = document.getElementById('dateChip');
-    const trackChipEl = document.getElementById('trackChip');
-    const trackChipLabelEl = document.getElementById('trackChipLabel');
+    const trackEmojiEl = document.getElementById('trackEmoji');
+    const trackLabelEl = document.getElementById('trackLabel');
     const tracksListEl = document.getElementById('tracksList');
 
+    const streakRingEl = document.getElementById('streakRing');
+    const streakRingInnerEl = document.getElementById('streakRingInner');
     const streakValueEl = document.getElementById('streakValue');
-    const todayWinsEl = document.getElementById('todayWins');
-    const totalWinsEl = document.getElementById('totalWins');
     const streakTagEl = document.getElementById('streakTag');
-    const todayTagEl = document.getElementById('todayTag');
-    const historyGridEl = document.getElementById('historyGrid');
-    const historySubtitleEl = document.getElementById('historySubtitle');
-    const weeklySummaryEl = document.getElementById('weeklySummary');
+
+    const effortRingEl = document.getElementById('effortRing');
+    const effortRingInnerEl = document.getElementById('effortRingInner');
+    const effortScoreEl = document.getElementById('effortScore');
+    const effortTagEl = document.getElementById('effortTag');
+
+    const consistencyRingEl = document.getElementById('consistencyRing');
+    const consistencyRingInnerEl = document.getElementById('consistencyRingInner');
+    const consistencyValueEl = document.getElementById('consistencyValue');
+    const consistencyTagEl = document.getElementById('consistencyTag');
+
+    const reminderRingEl = document.getElementById('reminderRing');
+    const reminderRingInnerEl = document.getElementById('reminderRingInner');
+    const reminderCountdownEl = document.getElementById('reminderCountdown');
+    const reminderTagEl = document.getElementById('reminderTag');
+
     const feedbackEl = document.getElementById('feedbackMessage');
+    const microGoalsContainerEl = document.getElementById('microGoalsContainer');
+    const microGoalsSummaryEl = document.getElementById('microGoalsSummary');
     const tasksContainerEl = document.getElementById('tasksContainer');
     const focusSectionEl = document.getElementById('focusSection');
     const focusContainerEl = document.getElementById('focusContainer');
-    const resetButtonEl = document.getElementById('resetButton');
+
+    const historyGridEl = document.getElementById('historyGrid');
+    const calendarGridEl = document.getElementById('calendarGrid');
+    const historySubtitleEl = document.getElementById('historySubtitle');
+    const historySummaryEl = document.getElementById('historySummary');
+    const historyViewToggleEl = document.getElementById('historyViewToggle');
+
     const customTitleInput = document.getElementById('customTitleInput');
     const customTagInput = document.getElementById('customTagInput');
     const customAddBtn = document.getElementById('customAddBtn');
+
     const reflectionInputEl = document.getElementById('reflectionInput');
 
+    const settingBrutalEnabledEl = document.getElementById('settingBrutalEnabled');
+    const settingBrutalLevelEl = document.getElementById('settingBrutalLevel');
+    const settingRemindersEnabledEl = document.getElementById('settingRemindersEnabled');
     const settingForgivenessEl = document.getElementById('settingForgiveness');
     const settingMaxPinnedEl = document.getElementById('settingMaxPinned');
     const settingToneEl = document.getElementById('settingTone');
+    const settingMentalHealthEl = document.getElementById('settingMentalHealth');
+    const settingAutoPostEl = document.getElementById('settingAutoPost');
+    const settingStorageModeEl = document.getElementById('settingStorageMode');
+    const reminderConfigContainerEl = document.getElementById('reminderConfigContainer');
 
-    // Onboarding elements
-    const onboardingOverlayEl = document.getElementById('onboardingOverlay');
-    const onboardingTitleEl = document.getElementById('onboardingTitle');
-    const onboardingBodyEl = document.getElementById('onboardingBody');
-    const onboardingListEl = document.getElementById('onboardingList');
-    const onboardingNextBtn = document.getElementById('onboardingNext');
-    const onboardingSkipBtn = document.getElementById('onboardingSkip');
-    const onboardingDots = document.querySelectorAll('.onboarding-dot');
+    const themeToggleEl = document.getElementById('themeToggle');
+    const activityChartEl = document.getElementById('activityChart');
+    const analyticsMetaEl = document.getElementById('analyticsMeta');
 
-    let feedbackTimeoutId = null;
-    let onboardingStep = 0;
+    const videoPreviewEl = document.getElementById('videoPreview');
+    const btnStartRecordingEl = document.getElementById('btnStartRecording');
+    const btnStopRecordingEl = document.getElementById('btnStopRecording');
+    const btnPlayWeeklyEl = document.getElementById('btnPlayWeekly');
+    const btnRandomShareEl = document.getElementById('btnRandomShare');
+    const videoGalleryEl = document.getElementById('videoGallery');
 
-    const ONBOARDING_STEPS = [
+    const buddyNameInputEl = document.getElementById('buddyNameInput');
+    const buddyAddBtnEl = document.getElementById('buddyAddBtn');
+    const buddyListEl = document.getElementById('buddyList');
+    const weeklyChallengeTextEl = document.getElementById('weeklyChallengeText');
+
+    const resetButtonEl = document.getElementById('resetButton');
+
+    // onboarding
+    const onboardOverlayEl = document.getElementById('onboardOverlay');
+    const onboardTitleEl = document.getElementById('onboardTitle');
+    const onboardBodyEl = document.getElementById('onboardBody');
+    const onboardListEl = document.getElementById('onboardList');
+    const onboardNextEl = document.getElementById('onboardNext');
+    const onboardSkipEl = document.getElementById('onboardSkip');
+    const onboardDots = document.querySelectorAll('.onboard-dot');
+
+    /****************************************************************
+     * Onboarding
+     ****************************************************************/
+    const ONBOARD_STEPS = [
       {
-        title: 'Tiny wins, big momentum.',
-        body: 'Atomic Wins is not about massive goals. It’s about actions so small you can finish them in under a minute.',
+        title: 'Tiny actions, big trajectories.',
+        body: 'Atomic Wins is not a todo list. It’s a tiny-wins engine that tracks whether you actually moved.',
         bullets: [
-          'No pressure. No giant checklists.',
-          'Just a few seconds of effort at a time.',
-          'Every tap is a little spark of momentum.'
-        ],
-        button: 'Next'
+          'Everything should be 10–60 seconds.',
+          'One logged win keeps the streak alive.',
+          'Consistency beats intensity.'
+        ]
       },
       {
-        title: 'Treat them like quests.',
-        body: 'Each card is a micro-quest. Do it once, tap “Mark as done”, and you’ve earned your win.',
+        title: 'Brutal honesty (optional).',
+        body: 'When enabled, streaks reset after 24 hours of inactivity and reminders get sharper.',
         bullets: [
-          'Pin star ⭐ quests you want to focus on today.',
-          'Build streaks by logging at least one win per day.',
-          'Miss a day? Forgiveness softens the streak if enabled.'
-        ],
-        button: 'Next'
+          'You stay in control – brutal mode is opt-in.',
+          'Mental health mode softens language.',
+          'Random share prompts never auto-post.'
+        ]
       },
       {
         title: 'You only owe yourself one win.',
-        body: 'On hard days, your only job is a single tiny win. Everything beyond that is pure bonus XP.',
+        body: 'On rough days, one tiny win is enough. Everything after that is bonus XP.',
         bullets: [
           'Log at least one micro-win today.',
-          'Write how you feel after your wins.',
-          'Come back tomorrow – keep the streak alive.'
-        ],
-        button: 'Begin'
+          'Record a quick proof clip if you want.',
+          'Come back tomorrow and keep the chain alive.'
+        ]
       }
     ];
+    let onboardingStep = 0;
 
-    const FEEDBACK_TEMPLATES = {
-      encouraging: {
-        first: 'First tiny win logged. Streak begins at 1. 🎯',
-        extend: (streak) => `Streak extended! Day ${streak} survives. 🔥`,
-        forgiving: 'You came back after a missed day. Streak softened, not broken. 💪',
-        newStreak: 'Tiny win registered. New streak forming. 🌱',
-        reset: 'Fresh start. New streak from today. ♻️',
-        combo2: 'Combo x2! You’re stacking tiny wins. ⚡',
-        combo3: 'You’re on a roll. Everything extra is bonus XP. 🏆',
-        generic: 'Nice tiny win. They add up more than you think. ✨'
-      },
-      gentle: {
-        first: 'You showed up. That’s a beautiful start. 🌱',
-        extend: (streak) => `Softly continuing… day ${streak} and counting. ✨`,
-        forgiving: 'You missed a day and still came back. That matters a lot. 💛',
-        newStreak: 'A fresh little streak is beginning. Be kind to yourself. 🌤️',
-        reset: 'New page, same you. Streak starts again from here. 📖',
-        combo2: 'Two tiny acts of care for yourself. That’s enough. 🤍',
-        combo3: 'You’ve already done more than you had to. Rest if you need. 🫧',
-        generic: 'Tiny steps are still steps. You’re doing okay. 🌾'
-      },
-      hype: {
-        first: 'LET’S GO! You just landed your first win. 🚀',
-        extend: (streak) => `Streak locked in. Day ${streak} is a W. 🔒🔥`,
-        forgiving: 'You dipped, but you’re back. That’s champion energy. 🥊',
-        newStreak: 'New streak online. Time to farm easy wins. 🎮',
-        reset: 'Hard reset. Fresh run unlocked. Speedrun this streak. ⚡',
-        combo2: 'Double-hit! Tiny win combo active. 💥',
-        combo3: 'You’re farming XP like a pro. Keep stacking. 🏆',
-        generic: 'Another one. You’re low-key unstoppable. 🧨'
-      }
-    };
-
-    function currentToneTemplates() {
-      return FEEDBACK_TEMPLATES[settings.tone] || FEEDBACK_TEMPLATES.encouraging;
-    }
-
-    function ensureTodayEntry() {
-      if (!state.completionsByDay[todayKey]) {
-        state.completionsByDay[todayKey] = [];
-      }
-      if (!state.reflectionsByDay) {
-        state.reflectionsByDay = {};
-      }
-    }
-
-    function isTaskDoneToday(taskId) {
-      const list = state.completionsByDay[todayKey] || [];
-      return list.includes(taskId);
-    }
-
-    function isTaskPinned(taskId) {
-      return pinnedTaskIds.includes(taskId);
-    }
-
-    function mergeTasks() {
-      const defaults = getDefaultTasksForTrack(currentTrackId);
-      const ids = new Set();
-      const merged = [];
-
-      defaults.forEach(t => {
-        merged.push(t);
-        ids.add(t.id);
+    function renderOnboardingStep() {
+      const step = ONBOARD_STEPS[onboardingStep];
+      onboardTitleEl.textContent = step.title;
+      onboardBodyEl.textContent = step.body;
+      onboardListEl.innerHTML = '';
+      step.bullets.forEach(b => {
+        const li = document.createElement('li');
+        li.textContent = b;
+        onboardListEl.appendChild(li);
       });
+      onboardDots.forEach(dot => {
+        const s = Number(dot.dataset.step);
+        dot.classList.toggle('active', s === onboardingStep);
+      });
+      onboardNextEl.textContent = onboardingStep === ONBOARD_STEPS.length - 1 ? 'Begin' : 'Next';
+    }
 
-      customTasks.forEach(t => {
-        if (!ids.has(t.id)) {
-          merged.push(t);
+    function maybeShowOnboarding() {
+      if (hasOnboarded()) return;
+      onboardingStep = 0;
+      renderOnboardingStep();
+      onboardOverlayEl.style.display = 'flex';
+
+      onboardNextEl.onclick = () => {
+        if (onboardingStep < ONBOARD_STEPS.length - 1) {
+          onboardingStep++;
+          renderOnboardingStep();
+        } else {
+          setOnboarded();
+          onboardOverlayEl.style.display = 'none';
         }
+      };
+
+      onboardSkipEl.onclick = () => {
+        setOnboarded();
+        onboardOverlayEl.style.display = 'none';
+		      };
+    }
+
+    /****************************************************************
+     * Theme + basic init helpers
+     ****************************************************************/
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', theme);
+      themeToggleEl.checked = theme === 'dark';
+    }
+
+    function initTheme() {
+      const saved = loadTheme();
+      applyTheme(saved);
+      themeToggleEl.addEventListener('change', () => {
+        const next = themeToggleEl.checked ? 'dark' : 'light';
+        applyTheme(next);
+        saveTheme(next);
       });
-
-      tasks = merged;
-      // Clean up pinned that no longer exist
-      pinnedTaskIds = pinnedTaskIds.filter(id => tasks.find(t => t.id === id));
-      savePinned(currentTrackId, pinnedTaskIds);
     }
 
-    function showFeedbackMessage(text) {
-      if (!feedbackEl) return;
-      feedbackEl.textContent = text;
-      feedbackEl.classList.add('show');
-      if (feedbackTimeoutId) {
-        clearTimeout(feedbackTimeoutId);
+    /****************************************************************
+     * Streak / stats / history logic
+     ****************************************************************/
+    function ensureStateConsistency() {
+      const todayK = todayKey();
+      // Initialize data structures
+      state.completionsByDay = state.completionsByDay || {};
+      state.reflectionsByDay = state.reflectionsByDay || {};
+
+      // Brutal streak reset if we have skipped >= 1 full day
+      if (state.lastActivityDate && state.streak > 0) {
+        const diff = dayDiff(state.lastActivityDate, todayK);
+        if (diff !== null && diff >= 1) {
+          const hadToday = (state.completionsByDay[todayK] || []).length > 0;
+          if (!hadToday && settings.brutalEnabled) {
+            state.streak = 0;
+          } else if (!hadToday && !settings.brutalEnabled && !settings.streakForgiveness) {
+            // gentle non-brutal reset when forgiveness off
+            state.streak = 0;
+          } else if (!hadToday && !settings.brutalEnabled && settings.streakForgiveness) {
+            // soften the impact
+            state.streak = Math.round(state.streak * 0.5);
+          }
+        }
       }
-      feedbackTimeoutId = setTimeout(() => {
-        feedbackEl.classList.remove('show');
-      }, 2000);
+
+      saveState();
     }
 
-    function buildFeedbackText({ todayCount, streak, gap }) {
-      const tone = currentToneTemplates();
-
-      if (todayCount === 1 && !state.lastActivityDate) {
-        return tone.first;
-      }
-      if (todayCount === 1 && gap === 1) {
-        return tone.extend(streak);
-      }
-      if (todayCount === 1 && gap === 2) {
-        if (settings.streakForgiveness) return tone.forgiving;
-        return tone.reset;
-      }
-      if (todayCount === 1 && (gap === null || gap === undefined)) {
-        return tone.newStreak;
-      }
-      if (todayCount === 1 && gap >= 3) {
-        return tone.reset;
-      }
-      if (todayCount === 2) {
-        return tone.combo2;
-      }
-      if (todayCount >= 3) {
-        return tone.combo3;
-      }
-      return tone.generic;
+    function getWinsForDate(dateKey) {
+      return (state.completionsByDay && state.completionsByDay[dateKey]) || [];
     }
 
-    function updateTrackChip() {
-      const track = getTrackById(currentTrackId);
-      trackChipEl.querySelector('.emoji').textContent = track.emoji;
-      trackChipLabelEl.textContent = track.label;
+    function getLast7DateKeys() {
+      const arr = [];
+      const base = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(base);
+        d.setDate(d.getDate() - i);
+        arr.push(dateKeyFor(d));
+      }
+      return arr;
     }
 
-    function renderTrackSelector() {
-      tracksListEl.innerHTML = '';
-      TRACKS.forEach(track => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'track-pill';
-        if (track.id === currentTrackId) btn.classList.add('active');
+    function computeEffortScore() {
+      const keys7 = getLast7DateKeys();
+      let wins7 = 0;
+      keys7.forEach(k => { wins7 += getWinsForDate(k).length; });
 
-        const emojiSpan = document.createElement('span');
-        emojiSpan.className = 'emoji';
-        emojiSpan.textContent = track.emoji;
+      const todayWins = getWinsForDate(today).length;
+      const reflection = (state.reflectionsByDay && state.reflectionsByDay[today]) || '';
 
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'track-name';
-        nameSpan.textContent = track.name;
+      const base = clamp(Math.round((wins7 / 40) * 80), 0, 80);
+      const streakBonus = clamp(state.streak * 2, 0, 15);
+      const todayBonus = clamp(todayWins * 5, 0, 20);
+      const reflectionBonus = reflection ? 5 : 0;
 
-        btn.appendChild(emojiSpan);
-        btn.appendChild(nameSpan);
+      let score = base + streakBonus + todayBonus + reflectionBonus;
 
-        btn.title = track.description;
+      if (settings.mentalHealthMode && settings.brutalEnabled) {
+        // soften extremes a bit when mental health mode is on
+        score = Math.round(score * 0.9);
+      }
 
-        btn.addEventListener('click', () => {
-          if (track.id === currentTrackId) return;
-          currentTrackId = track.id;
-          saveSelectedTrackId(currentTrackId);
-          customTasks = loadCustomTasks(currentTrackId);
-          pinnedTaskIds = loadPinned(currentTrackId);
-          mergeTasks();
-          updateTrackChip();
-          renderTrackSelector();
-          renderFocusSection();
-          renderTasks();
-          showFeedbackMessage(`Track switched to ${track.name}. New quests loaded. ✨`);
-        });
+      return clamp(score, 0, 100);
+    }
 
-        tracksListEl.appendChild(btn);
+    function computeConsistency() {
+      const keys7 = getLast7DateKeys();
+      let activeDays = 0;
+      keys7.forEach(k => {
+        if (getWinsForDate(k).length > 0) activeDays++;
       });
+      return {
+        daysActive: activeDays,
+        total: keys7.length
+      };
     }
 
     function updateStatsUI() {
-      const todayList = state.completionsByDay[todayKey] || [];
-      const todayCount = todayList.length;
+      const todayWins = getWinsForDate(today).length;
 
-      dateChipEl.textContent = formatNiceDate();
-      streakValueEl.textContent = state.streak;
-      todayWinsEl.textContent = todayCount;
-      totalWinsEl.textContent = state.totalWins;
+      // Streak
+      streakValueEl.textContent = state.streak || 0;
+      streakRingEl.style.setProperty('--p', clamp((state.streak / 30) * 100, 0, 100));
+      streakRingInnerEl.textContent = state.streak || 0;
 
-      if (state.streak === 0) {
-        streakTagEl.textContent = 'No streak yet. Start today.';
+      if (!state.streak) {
+        streakTagEl.textContent = 'No streak yet. One tiny win starts it.';
       } else if (state.streak < 3) {
-        streakTagEl.textContent = 'Nice. You’re building the chain.';
+        streakTagEl.textContent = 'Early streak. Protect it with one tiny action.';
       } else if (state.streak < 7) {
-        streakTagEl.textContent = 'Solid run. Keep feeding it.';
+        streakTagEl.textContent = 'Nice. You’re proving this isn’t a phase.';
       } else {
-        streakTagEl.textContent = 'You’re on fire. Don’t break it.';
+        streakTagEl.textContent = `You’re in rare territory. ${state.streak} days is not an accident.`;
       }
 
-      if (todayCount === 0) {
-        todayTagEl.textContent = 'Tap one tiny win to begin.';
-      } else if (todayCount < 3) {
-        todayTagEl.textContent = 'Momentum unlocked. Keep going if you like.';
+      // Effort
+      const effort = computeEffortScore();
+      effortScoreEl.textContent = effort;
+      effortRingEl.style.setProperty('--p', effort);
+      effortRingInnerEl.textContent = effort;
+
+      if (effort === 0) {
+        effortTagEl.textContent = 'Do one microscopic win. Then close this app.';
+      } else if (effort < 40) {
+        effortTagEl.textContent = 'Tiny moves happening. You’re out of neutral.';
+      } else if (effort < 70) {
+        effortTagEl.textContent = 'Solid effort. This is how identity shifts. Keep going.';
       } else {
-        todayTagEl.textContent = 'You’ve already done plenty. Extra is bonus.';
+        effortTagEl.textContent = 'You’re operating like a top performer today.';
       }
 
-      renderHistory();
+      // Consistency
+      const consistency = computeConsistency();
+      consistencyValueEl.textContent = consistency.daysActive;
+      const pct = Math.round((consistency.daysActive / consistency.total) * 100);
+      consistencyRingEl.style.setProperty('--p', pct);
+      consistencyRingInnerEl.textContent = `${pct}%`;
+
+      if (consistency.daysActive === 0) {
+        consistencyTagEl.textContent = 'We track follow-through, not vibes. Get one day on the board.';
+      } else if (consistency.daysActive <= 3) {
+        consistencyTagEl.textContent = 'You’re showing up some of the time. Let’s nudge that upward.';
+      } else if (consistency.daysActive <= 5) {
+        consistencyTagEl.textContent = 'You’re more consistent than most people already.';
+      } else {
+        consistencyTagEl.textContent = 'Elite consistency. You’re behaving like your future self now.';
+      }
+
+      // Date / subtitle
+      dateChipEl.textContent = niceDate();
+      const subtitleEl = document.getElementById('subtitleText');
+      if (effort === 0) {
+        subtitleEl.textContent = 'You don’t need motivation. You need one tiny rep.';
+      } else if (effort > 80) {
+        subtitleEl.textContent = 'You’re on a tear today. Make tomorrow jealous.';
+      } else {
+        subtitleEl.textContent = 'Tiny wins, ruthless consistency. No more “tomorrow”.';
+      }
     }
 
-    function renderHistory() {
+    function updateHistoryUI() {
+      const last7 = getLast7DateKeys();
       historyGridEl.innerHTML = '';
+      let totalWins = 0;
 
-      const today = new Date();
-      let maxCount = 0;
-      const days = [];
+      last7.forEach(key => {
+        const wins = getWinsForDate(key).length;
+        totalWins += wins;
+        const d = parseKeyToDate(key);
+        const isToday = key === today;
 
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(today.getDate() - i);
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        const count = (state.completionsByDay[key] || []).length;
-        maxCount = Math.max(maxCount, count);
-        days.push({ date: d, key, count });
-      }
-
-      days.forEach(({ date, key, count }) => {
         const item = document.createElement('div');
-        item.className = 'history-item';
-        if (key === todayKey) item.classList.add('today');
+        item.className = 'history-item' + (isToday ? ' today' : '');
 
         const dayLabel = document.createElement('div');
         dayLabel.className = 'history-day';
-        dayLabel.textContent = shortDayName(date);
+        dayLabel.textContent = shortDow(d);
 
         const bar = document.createElement('div');
         bar.className = 'history-bar';
 
         const fill = document.createElement('div');
-        fill.className = 'history-bar-fill';
-        const width = maxCount === 0 ? 0 : (count / maxCount) * 100;
-        fill.style.width = `${width}%`;
+        fill.className = 'history-fill';
+        const pct = clamp(wins * 20, 0, 100);
+        fill.style.width = pct + '%';
 
         bar.appendChild(fill);
 
-        const countLabel = document.createElement('div');
-        countLabel.className = 'history-count';
-        countLabel.textContent = count === 0 ? '–' : `${count}`;
+        const count = document.createElement('div');
+        count.className = 'history-count';
+        count.textContent = wins ? `${wins} wins` : '—';
 
         item.appendChild(dayLabel);
         item.appendChild(bar);
-        item.appendChild(countLabel);
+        item.appendChild(count);
         historyGridEl.appendChild(item);
       });
 
-      const total7 = days.reduce((sum, d) => sum + d.count, 0);
-      if (total7 === 0) {
-        historySubtitleEl.textContent = 'No wins logged in the last 7 days yet.';
-        weeklySummaryEl.textContent = 'Once you start logging wins, your weekly summary will appear here.';
-        return;
-      } else {
-        historySubtitleEl.textContent = `${total7} wins in the last 7 days.`;
-      }
+      const activeDays = last7.filter(k => getWinsForDate(k).length > 0).length;
+      historySubtitleEl.textContent = `${activeDays} / 7 days with wins`;
 
-      const activeDays = days.filter(d => d.count > 0).length;
-      const best = days.reduce((best, d) => d.count > best.count ? d : best, { count: -1 });
-      const bestLabel = best.count > 0 ? `${shortDayName(best.date)} (${best.count})` : '—';
-
-      const reflections = state.reflectionsByDay || {};
-      const recentReflections = [];
-      days.forEach(d => {
-        const r = reflections[d.key];
-        if (r && r.trim()) {
-          recentReflections.push({ key: d.key, text: r.trim() });
-        }
-      });
-
-      let summary = `Active days: <span class="highlight">${activeDays}/7</span>. Best day: <span class="highlight">${bestLabel}</span>.`;
-      if (recentReflections.length > 0) {
-        const last = recentReflections[recentReflections.length - 1];
-        summary += ` Last note: “${last.text.slice(0, 40)}${last.text.length > 40 ? '…' : ''}”`;
-      }
-
-      weeklySummaryEl.innerHTML = summary;
+      const avg = (totalWins / last7.length).toFixed(1);
+      historySummaryEl.innerHTML =
+        `Last 7 days: <span class="highlight">${totalWins} total wins</span> · avg ${avg} per day.` +
+        (activeDays >= 5 ? ' That’s top-performer behavior.' : ' Aim for 4+ active days. That’s where compounding kicks in.');
     }
 
-    function togglePin(taskId) {
-      if (isTaskPinned(taskId)) {
-        pinnedTaskIds = pinnedTaskIds.filter(id => id !== taskId);
+    function updateCalendarUI() {
+      calendarGridEl.innerHTML = '';
+      const base = new Date();
+      const year = base.getFullYear();
+      const month = base.getMonth();
+
+      const firstOfMonth = new Date(year, month, 1);
+      const lastOfMonth = new Date(year, month + 1, 0);
+      const numDays = lastOfMonth.getDate();
+
+      for (let day = 1; day <= numDays; day++) {
+        const d = new Date(year, month, day);
+        const key = dateKeyFor(d);
+        const wins = getWinsForDate(key).length;
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell';
+        if (wins > 0) cell.classList.add('has');
+        if (key === today) cell.classList.add('today');
+        cell.textContent = String(day);
+        calendarGridEl.appendChild(cell);
+      }
+    }
+
+    function toggleHistoryView() {
+      const isCalendarVisible = calendarGridEl.style.display !== 'none';
+      if (isCalendarVisible) {
+        calendarGridEl.style.display = 'none';
+        historyGridEl.style.display = 'grid';
+        historyViewToggleEl.textContent = 'Calendar';
       } else {
-        const maxPinned = Number(settings.maxPinned) || 3;
+        updateCalendarUI();
+        calendarGridEl.style.display = 'grid';
+        historyGridEl.style.display = 'none';
+        historyViewToggleEl.textContent = '7-day bars';
+      }
+    }
+
+    /****************************************************************
+     * Brutal messages / notification-style feedback
+     ****************************************************************/
+    function baseBrutalMessage(context) {
+      const winsToday = getWinsForDate(today).length;
+      const consistency = computeConsistency();
+      const effort = computeEffortScore();
+
+      const level = settings.brutalLevel || 'soft';
+      const mh = settings.mentalHealthMode;
+
+      const soften = msg => mh ? msg.replace(/pathetic|embarrassing|coward/gi, 'avoidable') : msg;
+
+      // context: 'win', 'idle', 'micro-missed'
+      if (context === 'win') {
+        if (level === 'relentless') {
+          return soften(`Nice. That’s one rep. But don’t confuse one tiny win with being “done” – stack another while you’re here.`);
+        } else if (level === 'hard') {
+          return soften(`Good. Today won’t be a zero. You just removed one excuse from future you.`);
+        } else {
+          return soften(`That’s a real action on the board. Tiny, but real. Take a breath and notice that.`);
+        }
+      }
+
+      if (context === 'micro-missed') {
+        if (winsToday === 0) {
+          if (level === 'relentless') {
+            return soften(`You literally wrote goals and then ghosted them. That’s how “someday” people live. You’re not that person, right?`);
+          } else if (level === 'hard') {
+            return soften(`You designed micro-goals and still didn’t touch them. Shrink them again or admit they don’t matter.`);
+          } else {
+            return soften(`Those micro-goals were supposed to be tiny. If they still felt heavy, make them even smaller tomorrow.`);
+          }
+        } else {
+          if (level === 'relentless') {
+            return soften(`You hit some wins but skipped your main micro-goals. Close the gap between what you say matters and what you touch.`);
+          } else if (level === 'hard') {
+            return soften(`Wins logged. But your micro-goals got ignored. Tomorrow, start with them first.`);
+          } else {
+            return soften(`You made progress, but your micro-goals didn’t all fire. That’s okay – tune them and try again tomorrow.`);
+          }
+        }
+      }
+
+      // idle / end-of-day check
+      if (winsToday === 0) {
+        if (level === 'relentless') {
+          return soften(`Brutally simple: you either log one tiny win today or you prove to yourself that talking is easier than acting.`);
+        } else if (level === 'hard') {
+          return soften(`Still at zero wins. One 30-second action is enough to avoid another “I’ll start tomorrow” day.`);
+        } else {
+          return soften(`You’re one tiny action away from turning today into progress instead of another blur.`);
+        }
+      } else {
+        if (effort < 40) {
+          return soften(`You did the bare minimum. That’s fine. But don’t confuse “not zero” with “I gave what I could.”`);
+        } else if (consistency.daysActive < 4) {
+          return soften(`Today was a win. The real question: will you be here again tomorrow, or is this another one-off spike?`);
+        } else {
+          return soften(`You’re stringing together real behavior change. Protect this trajectory like it matters – because it does.`);
+        }
+      }
+    }
+
+    function showFeedback(message, opts = {}) {
+      if (!message) return;
+      if (feedbackTimeoutId) {
+        clearTimeout(feedbackTimeoutId);
+        feedbackTimeoutId = null;
+      }
+      feedbackEl.textContent = message;
+      feedbackEl.classList.add('show');
+      feedbackTimeoutId = setTimeout(() => {
+        feedbackEl.classList.remove('show');
+      }, opts.duration || 6500);
+    }
+
+    /****************************************************************
+     * Brutal reminders / countdown
+     ****************************************************************/
+    function renderReminderConfig() {
+      reminderConfigContainerEl.innerHTML = '';
+      brutalConfig.times.forEach((timeStr, idx) => {
+        const row = document.createElement('div');
+        row.className = 'reminder-row';
+
+        const iEl = document.createElement('div');
+        iEl.className = 'reminder-index';
+        iEl.textContent = idx + 1;
+
+        const timeInput = document.createElement('input');
+        timeInput.type = 'time';
+        timeInput.className = 'input-pill-sm';
+        timeInput.value = timeStr;
+
+        timeInput.addEventListener('change', () => {
+          brutalConfig.times[idx] = timeInput.value || DEFAULT_BRUTAL_CONFIG.times[idx];
+          saveBrutal();
+          updateReminderCountdown();
+        });
+
+        const msgInput = document.createElement('input');
+        msgInput.type = 'text';
+        msgInput.className = 'reminder-msg';
+        msgInput.placeholder = DEFAULT_BRUTAL_CONFIG.messages[idx];
+        msgInput.value = brutalConfig.messages[idx] || '';
+
+        msgInput.addEventListener('input', () => {
+          brutalConfig.messages[idx] = msgInput.value || DEFAULT_BRUTAL_CONFIG.messages[idx];
+          saveBrutal();
+        });
+
+        row.appendChild(iEl);
+        row.appendChild(timeInput);
+        row.appendChild(msgInput);
+        reminderConfigContainerEl.appendChild(row);
+      });
+    }
+
+    function computeNextReminderDate() {
+      if (!settings.remindersEnabled || !settings.brutalEnabled) return null;
+      const now = new Date();
+      const todayStr = todayKey();
+
+      const times = brutalConfig.times.slice().sort();
+      let next = null;
+
+      for (let i = 0; i < times.length; i++) {
+        const [h, m] = times[i].split(':').map(Number);
+        const candidate = new Date();
+        candidate.setHours(h || 0, m || 0, 0, 0);
+        if (candidate > now) {
+          next = candidate;
+          break;
+        }
+      }
+
+      if (!next) {
+        // tomorrow first reminder
+        const [h, m] = times[0].split(':').map(Number);
+        next = new Date();
+        next.setDate(next.getDate() + 1);
+        next.setHours(h || 0, m || 0, 0, 0);
+      }
+
+      // avoid double-firing: track lastFired by date & index
+      brutalConfig.lastFired = brutalConfig.lastFired || {};
+      saveBrutal();
+
+      return next;
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return '00:00';
+      const totalSeconds = Math.floor(ms / 1000);
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      if (mins > 99) return '99:59';
+      return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+
+    function updateReminderCountdown() {
+      const next = computeNextReminderDate();
+      if (!next) {
+        reminderCountdownEl.textContent = '--:--';
+        reminderRingEl.style.setProperty('--p', 0);
+        reminderRingInnerEl.textContent = '--';
+        reminderTagEl.textContent = 'Brutal pings are off. You’re flying manual.';
+        return;
+      }
+
+      const now = new Date();
+      const msUntil = next - now;
+      reminderCountdownEl.textContent = formatCountdown(msUntil);
+      const totalWindowMs = 6 * 60 * 60 * 1000; // approximate 6h window
+      const pct = clamp(100 - Math.round((msUntil / totalWindowMs) * 100), 0, 100);
+      reminderRingEl.style.setProperty('--p', pct);
+      reminderRingInnerEl.textContent = next.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      reminderTagEl.textContent = 'Countdown until your next brutal ping.';
+    }
+
+    function maybeTriggerBrutalReminder() {
+      if (!settings.brutalEnabled || !settings.remindersEnabled) return;
+      const next = computeNextReminderDate();
+      if (!next) return;
+      const now = new Date();
+      const diffMs = next - now;
+      // We don't have background alarms; we approximate: if < 20s and we haven't fired for this timeslot, emit message.
+      if (diffMs < 20000 && diffMs > -20000) {
+        const key = todayKey();
+        brutalConfig.lastFired = brutalConfig.lastFired || {};
+        const stampKey = key + '|' + next.getHours() + ':' + next.getMinutes();
+        if (!brutalConfig.lastFired[stampKey]) {
+          brutalConfig.lastFired[stampKey] = Date.now();
+          saveBrutal();
+          showFeedback(baseBrutalMessage('idle'), { duration: 9000 });
+        }
+      }
+    }
+
+    function startBrutalLoop() {
+      if (brutalTimerId) clearInterval(brutalTimerId);
+      updateReminderCountdown();
+      brutalTimerId = setInterval(() => {
+        updateReminderCountdown();
+        maybeTriggerBrutalReminder();
+      }, 15000);
+    }
+
+    /****************************************************************
+     * Micro-goals
+     ****************************************************************/
+    function ensureTodayMicroGoals() {
+      microGoalsMap[today] = microGoalsMap[today] || [];
+      if (!Array.isArray(microGoalsMap[today]) || microGoalsMap[today].length !== MICRO_GOALS_PER_DAY) {
+        const existing = microGoalsMap[today] || [];
+        const arr = [];
+        for (let i = 0; i < MICRO_GOALS_PER_DAY; i++) {
+          arr.push(existing[i] || { text: '', done: false });
+        }
+        microGoalsMap[today] = arr;
+        saveMicroGoals();
+      }
+    }
+
+    function renderMicroGoals() {
+      ensureTodayMicroGoals();
+      const goals = microGoalsMap[today];
+      microGoalsContainerEl.innerHTML = '';
+      let completed = 0;
+
+      goals.forEach((goal, idx) => {
+        const row = document.createElement('div');
+        row.className = 'micro-goal-row';
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!goal.done;
+        cb.addEventListener('change', () => {
+          goal.done = cb.checked;
+          saveMicroGoals();
+          renderMicroGoals();
+        });
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'micro-input';
+        input.placeholder = ['1 tiny business / career move', '1 tiny body move', '1 tiny brain / connection move'][idx] || 'Tiny micro-goal';
+        input.value = goal.text || '';
+        input.addEventListener('input', () => {
+          goal.text = input.value;
+          saveMicroGoals();
+        });
+
+        row.appendChild(cb);
+        row.appendChild(input);
+        microGoalsContainerEl.appendChild(row);
+
+        if (goal.done) completed++;
+      });
+
+      microGoalsSummaryEl.textContent = `${completed} / ${MICRO_GOALS_PER_DAY} completed`;
+
+      // end-of-day gentle brutal if none checked
+      const now = new Date();
+      if (now.getHours() >= 20 && settings.brutalEnabled && completed === 0) {
+        showFeedback(baseBrutalMessage('micro-missed'), { duration: 9000 });
+      }
+    }
+
+    /****************************************************************
+     * Tracks & tasks
+     ****************************************************************/
+    function buildTaskListForTrack(trackId) {
+      const baseTasks = getDefaultTasks(trackId).map(t => Object.assign({}, t));
+      const custom = loadCustomTasks(trackId).map(t => Object.assign({}, t));
+      return baseTasks.concat(custom);
+    }
+
+    function renderTracks() {
+      tracksListEl.innerHTML = '';
+      TRACKS.forEach(track => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'track-pill' + (track.id === currentTrackId ? ' active' : '');
+        pill.innerHTML = `<span>${track.emoji}</span><span>${track.name}</span>`;
+        pill.title = track.desc;
+        pill.addEventListener('click', () => {
+          currentTrackId = track.id;
+          localStorage.setItem(STORAGE_TRACK_KEY, currentTrackId);
+          customTasks = loadCustomTasks(currentTrackId);
+          pinnedTaskIds = loadPinned(currentTrackId);
+          trackEmojiEl.textContent = track.emoji;
+          trackLabelEl.textContent = track.label;
+          renderTracks();
+          taskList = buildTaskListForTrack(currentTrackId);
+          renderTasks();
+          renderFocusSection();
+        });
+        tracksListEl.appendChild(pill);
+      });
+
+      const currentTrack = getTrack(currentTrackId);
+      trackEmojiEl.textContent = currentTrack.emoji;
+      trackLabelEl.textContent = currentTrack.label;
+    }
+
+    function renderTasks() {
+      tasksContainerEl.innerHTML = '';
+      const todayWins = getWinsForDate(today);
+
+      taskList.forEach(task => {
+        const card = document.createElement('article');
+        card.className = 'task-card';
+
+        const isDoneToday = todayWins.includes(task.id);
+        if (isDoneToday) card.classList.add('done');
+
+        const emoji = document.createElement('div');
+        emoji.className = 'task-emoji';
+        emoji.textContent = task.emoji || '✅';
+
+        const main = document.createElement('div');
+        main.className = 'task-main';
+
+        const title = document.createElement('div');
+        title.className = 'task-title';
+        title.textContent = task.title;
+
+        const desc = document.createElement('div');
+        desc.className = 'task-desc';
+        desc.textContent = task.desc || '';
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'task-meta-row';
+
+        const tag = document.createElement('div');
+        tag.className = 'task-tag';
+        tag.textContent = task.tag || '~30 sec';
+
+        const pinBtn = document.createElement('button');
+        pinBtn.type = 'button';
+        pinBtn.className = 'pin-btn' + (pinnedTaskIds.includes(task.id) ? ' pinned' : '');
+        pinBtn.textContent = pinnedTaskIds.includes(task.id) ? 'Pinned' : 'Pin to focus';
+        pinBtn.addEventListener('click', () => {
+          togglePinTask(task.id);
+        });
+
+        const actions = document.createElement('div');
+        actions.className = 'task-actions';
+
+        const doneBtn = document.createElement('button');
+        doneBtn.type = 'button';
+        doneBtn.className = 'btn btn-primary btn-small' + (isDoneToday ? ' done btn-disabled' : '');
+        doneBtn.textContent = isDoneToday ? 'Logged' : 'Mark as done';
+        doneBtn.addEventListener('click', () => {
+          if (isDoneToday) return;
+          handleTaskCompletion(task);
+        });
+
+        const proofBtn = document.createElement('button');
+        proofBtn.type = 'button';
+        proofBtn.className = 'btn btn-ghost btn-small';
+        proofBtn.textContent = 'Record proof';
+        proofBtn.addEventListener('click', () => {
+          currentVideoTagTitle = task.title;
+          startVideoCaptureHint();
+        });
+
+        actions.appendChild(doneBtn);
+        actions.appendChild(proofBtn);
+
+        metaRow.appendChild(tag);
+        metaRow.appendChild(pinBtn);
+
+        main.appendChild(title);
+        main.appendChild(desc);
+        main.appendChild(metaRow);
+        main.appendChild(actions);
+
+        card.appendChild(emoji);
+        card.appendChild(main);
+        tasksContainerEl.appendChild(card);
+      });
+    }
+
+    function handleTaskCompletion(task) {
+      const todayK = today;
+      state.completionsByDay[todayK] = state.completionsByDay[todayK] || [];
+      if (!state.completionsByDay[todayK].includes(task.id)) {
+        state.completionsByDay[todayK].push(task.id);
+        state.totalWins = (state.totalWins || 0) + 1;
+      }
+
+      // Streak update
+      if (!state.lastActivityDate) {
+        state.streak = 1;
+      } else {
+        const diff = dayDiff(state.lastActivityDate, todayK);
+        if (diff === 0) {
+          // same day, streak unchanged
+        } else if (diff === 1) {
+          state.streak = (state.streak || 0) + 1;
+        } else if (diff > 1) {
+          if (settings.brutalEnabled) {
+            state.streak = 1;
+          } else if (settings.streakForgiveness) {
+            state.streak = Math.max(1, Math.round((state.streak || 0) * 0.5));
+          } else {
+            state.streak = 1;
+          }
+        }
+      }
+      state.lastActivityDate = todayK;
+      saveState();
+
+      renderTasks();
+      updateStatsUI();
+      updateHistoryUI();
+      updateAnalytics();
+
+      if (settings.brutalEnabled) {
+        showFeedback(baseBrutalMessage('win'));
+      } else {
+        const tone = settings.tone || 'encouraging';
+        if (tone === 'gentle') {
+          showFeedback('You did a tiny thing that most people would keep postponing. That matters.');
+        } else if (tone === 'hype') {
+          showFeedback('Win logged. This is how people who actually change behave.');
+        } else {
+          showFeedback('Nice. You moved from intention to action.');
+        }
+      }
+    }
+
+    function togglePinTask(taskId) {
+      const idx = pinnedTaskIds.indexOf(taskId);
+      const maxPinned = Number(settings.maxPinned || 3);
+      if (idx >= 0) {
+        pinnedTaskIds.splice(idx, 1);
+      } else {
         if (pinnedTaskIds.length >= maxPinned) {
           pinnedTaskIds.shift();
         }
         pinnedTaskIds.push(taskId);
       }
       savePinned(currentTrackId, pinnedTaskIds);
-      pinnedTaskIds = pinnedTaskIds.filter(id => tasks.find(t => t.id === id));
-      savePinned(currentTrackId, pinnedTaskIds);
-      renderFocusSection();
       renderTasks();
-    }
-
-    function createTaskCard(task, options = {}) {
-      const { inFocusZone = false } = options;
-
-      const card = document.createElement('div');
-      card.className = 'task-card';
-      if (isTaskDoneToday(task.id)) {
-        card.classList.add('done');
-      }
-      if (inFocusZone) {
-        card.classList.add('focus-card');
-      }
-
-      const emoji = document.createElement('div');
-      emoji.className = 'task-emoji';
-      emoji.textContent = task.emoji || '⭐';
-
-      const main = document.createElement('div');
-      main.className = 'task-main';
-
-      const title = document.createElement('div');
-      title.className = 'task-title';
-      title.textContent = task.title;
-
-      const desc = document.createElement('div');
-      desc.className = 'task-desc';
-      desc.textContent = task.description || '';
-
-      const metaRow = document.createElement('div');
-      metaRow.className = 'task-meta-row';
-
-      const metaLeft = document.createElement('div');
-      metaLeft.className = 'task-meta-left';
-
-      const tag = document.createElement('div');
-      tag.className = 'task-tag';
-      tag.textContent = task.tag || 'tiny win';
-
-      const pinBtn = document.createElement('button');
-      pinBtn.className = 'pin-btn';
-      const pinned = isTaskPinned(task.id);
-      pinBtn.classList.toggle('pinned', pinned);
-      pinBtn.textContent = pinned ? '★ Focused' : '☆ Focus';
-
-      pinBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        togglePin(task.id);
-      });
-
-      metaLeft.appendChild(tag);
-      metaLeft.appendChild(pinBtn);
-
-      const btn = document.createElement('button');
-      btn.className = 'task-btn';
-      btn.textContent = 'Mark as done';
-
-      if (isTaskDoneToday(task.id)) {
-        btn.classList.add('done');
-        btn.textContent = 'Completed';
-      }
-
-      btn.addEventListener('click', () => {
-        if (isTaskDoneToday(task.id)) return;
-
-        ensureTodayEntry();
-        const beforeCount = state.completionsByDay[todayKey].length;
-        state.completionsByDay[todayKey].push(task.id);
-        state.totalWins += 1;
-
-        let gap = null;
-        if (beforeCount === 0) {
-          if (!state.lastActivityDate) {
-            state.streak = 1;
-          } else {
-            gap = diffDays(state.lastActivityDate, todayKey);
-
-            if (gap === 1) {
-              state.streak += 1;
-            } else if (gap === 2 && settings.streakForgiveness) {
-              state.streak = Math.max(1, state.streak - 1);
-            } else {
-              state.streak = 1;
-            }
-          }
-          state.lastActivityDate = todayKey;
-        }
-
-        saveState(state);
-
-        const nowCount = state.completionsByDay[todayKey].length;
-        const fbText = buildFeedbackText({
-          todayCount: nowCount,
-          streak: state.streak,
-          gap
-        });
-        showFeedbackMessage(fbText);
-
-        updateStatsUI();
-        renderFocusSection();
-        renderTasks();
-      });
-
-      metaRow.appendChild(metaLeft);
-      metaRow.appendChild(btn);
-
-      main.appendChild(title);
-      if (task.description) main.appendChild(desc);
-      main.appendChild(metaRow);
-
-      card.appendChild(emoji);
-      card.appendChild(main);
-
-      return card;
+      renderFocusSection();
     }
 
     function renderFocusSection() {
-      focusContainerEl.innerHTML = '';
-      pinnedTaskIds = pinnedTaskIds.filter(id => tasks.find(t => t.id === id));
-      savePinned(currentTrackId, pinnedTaskIds);
-
-      const focusTasks = tasks.filter(t => pinnedTaskIds.includes(t.id));
-      if (focusTasks.length === 0) {
+      const current = taskList.filter(t => pinnedTaskIds.includes(t.id));
+      if (!current.length) {
         focusSectionEl.style.display = 'none';
+        focusContainerEl.innerHTML = '';
         return;
       }
-
       focusSectionEl.style.display = 'block';
-      focusTasks.forEach(task => {
-        const card = createTaskCard(task, { inFocusZone: true });
-        focusContainerEl.appendChild(card);
-      });
-    }
+      focusContainerEl.innerHTML = '';
+      const todayWins = getWinsForDate(today);
 
-    function renderTasks() {
-      tasksContainerEl.innerHTML = '';
-      const regularTasks = tasks.filter(t => !pinnedTaskIds.includes(t.id));
+      current.forEach(task => {
+        const row = document.createElement('div');
+        row.className = 'task-meta-row';
+        const left = document.createElement('div');
+        left.textContent = `${task.emoji || '⭐'} ${task.title}`;
+        left.style.fontSize = '0.86rem';
+        const right = document.createElement('div');
+        right.className = 'task-actions';
 
-      regularTasks.forEach(task => {
-        const card = createTaskCard(task);
-        tasksContainerEl.appendChild(card);
-      });
-    }
-
-    function attachResetHandler() {
-      resetButtonEl.addEventListener('click', () => {
-        const ok = confirm('Reset ALL Atomic Wins data (stats + custom tasks + focus + reflections) on this device? This cannot be undone.');
-        if (!ok) return;
-        state = {
-          streak: 0,
-          lastActivityDate: null,
-          totalWins: 0,
-          completionsByDay: {},
-          reflectionsByDay: {}
-        };
-        TRACKS.forEach(track => {
-          localStorage.removeItem(CUSTOM_TASKS_BASE_KEY + track.id);
-          localStorage.removeItem(PINNED_BASE_KEY + track.id);
+        const done = todayWins.includes(task.id);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-primary btn-small' + (done ? ' done btn-disabled' : '');
+        btn.textContent = done ? 'Done' : 'Do now';
+        btn.addEventListener('click', () => {
+          if (!done) handleTaskCompletion(task);
         });
-        customTasks = loadCustomTasks(currentTrackId);
-        pinnedTaskIds = [];
-        mergeTasks();
-        saveState(state);
-        reflectionInputEl.value = '';
-        updateStatsUI();
-        renderFocusSection();
-        renderTasks();
-        showFeedbackMessage('Everything reset. Fresh run unlocked. 🔄');
+
+        right.appendChild(btn);
+        row.appendChild(left);
+        row.appendChild(right);
+        focusContainerEl.appendChild(row);
       });
     }
 
-    function attachCustomTaskHandler() {
+    /****************************************************************
+     * Custom tiny wins
+     ****************************************************************/
+    function initCustomTaskControls() {
       customAddBtn.addEventListener('click', () => {
         const title = (customTitleInput.value || '').trim();
         const tag = (customTagInput.value || '').trim();
-
-        if (!title) {
-          alert('Give your tiny win a short title, e.g. “Send 1 kind message”.');
-          return;
-        }
-
-        const task = {
-          id: 'user-' + currentTrackId + '-' + Date.now().toString(36),
-          emoji: '⭐',
+        if (!title) return;
+        const id = `custom-${Date.now().toString(36)}`;
+        const t = {
+          id,
+          emoji: '✨',
           title,
-          description: '',
-          tag: tag || 'tiny win'
+          tag: tag || '~60 sec',
+          desc: 'Custom tiny win'
         };
-
-        customTasks.push(task);
+        customTasks.push(t);
         saveCustomTasks(currentTrackId, customTasks);
         customTitleInput.value = '';
         customTagInput.value = '';
-
-        mergeTasks();
-        renderFocusSection();
+        taskList = buildTaskListForTrack(currentTrackId);
         renderTasks();
-        showFeedbackMessage('New tiny quest added to your list. ✨');
+        renderFocusSection();
       });
     }
 
-    function attachReflectionHandler() {
+    /****************************************************************
+     * Reflection
+     ****************************************************************/
+    function initReflection() {
+      reflectionInputEl.value = (state.reflectionsByDay && state.reflectionsByDay[today]) || '';
       reflectionInputEl.addEventListener('input', () => {
-        const text = reflectionInputEl.value || '';
-        if (!state.reflectionsByDay) {
-          state.reflectionsByDay = {};
-        }
-        if (text.trim().length === 0) {
-          delete state.reflectionsByDay[todayKey];
-        } else {
-          state.reflectionsByDay[todayKey] = text;
-        }
-        saveState(state);
-        renderHistory();
+        state.reflectionsByDay[today] = reflectionInputEl.value;
+        saveState();
+        updateStatsUI();
+        updateAnalytics();
       });
     }
 
-    function populateReflection() {
-      if (!state.reflectionsByDay) {
-        state.reflectionsByDay = {};
+    /****************************************************************
+     * Analytics – lightweight chart & “AI-style” text
+     ****************************************************************/
+    function drawActivityChart() {
+      if (!activityChartEl) return;
+      const ctx = activityChartEl.getContext('2d');
+      const width = activityChartEl.width;
+      const height = activityChartEl.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const last7 = getLast7DateKeys();
+      const values = last7.map(k => getWinsForDate(k).length);
+      const maxVal = Math.max(3, ...values);
+
+      const padding = 10;
+      const chartWidth = width - padding * 2;
+      const chartHeight = height - padding * 2;
+
+      // grid
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid') || '#1f2937';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i <= 3; i++) {
+        const y = padding + (chartHeight / 3) * i;
+        ctx.moveTo(padding, y);
+        ctx.lineTo(padding + chartWidth, y);
       }
-      const existing = state.reflectionsByDay[todayKey] || '';
-      reflectionInputEl.value = existing;
+      ctx.stroke();
+
+      // bars
+      const barWidth = chartWidth / (last7.length * 1.4);
+      const step = chartWidth / last7.length;
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-strong') || '#22c55e';
+
+      values.forEach((v, i) => {
+        const x = padding + step * i + (step - barWidth) / 2;
+        const h = (v / maxVal) * (chartHeight * 0.9);
+        const y = padding + chartHeight - h;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, h || 2, 4);
+        ctx.fill();
+      });
     }
 
-    function attachSettingsHandler() {
-      // Initialize controls
-      settingForgivenessEl.checked = !!settings.streakForgiveness;
+    function updateAnalytics() {
+      drawActivityChart();
+
+      const last7 = getLast7DateKeys();
+      const wins7 = last7.reduce((sum, k) => sum + getWinsForDate(k).length, 0);
+      const consistency = computeConsistency();
+      const effort = computeEffortScore();
+
+      if (wins7 === 0 && !state.streak) {
+        analyticsMetaEl.textContent = 'Log a few wins and I’ll surface patterns, weak spots, and top-performer comparisons.';
+        return;
+      }
+
+      let tier;
+      if (consistency.daysActive >= 5 && effort >= 70) {
+        tier = 'top 10% consistency';
+      } else if (consistency.daysActive >= 4 && effort >= 50) {
+        tier = 'top 25% consistency';
+      } else if (consistency.daysActive >= 3) {
+        tier = 'about average consistency';
+      } else {
+        tier = 'below your potential. The good news: that’s easy to fix.';
+      }
+
+      analyticsMetaEl.innerHTML =
+        `Last 7 days: <span class="highlight">${wins7} logged wins</span> across ` +
+        `<span class="highlight">${consistency.daysActive} active days</span>. ` +
+        `Your current pattern looks like <span class="highlight">${tier}</span> for people who track this stuff.`;
+    }
+
+    /****************************************************************
+     * Video recording + IndexedDB clips
+     ****************************************************************/
+    const VIDEO_DB_NAME = 'AtomicWinsVideos_v1';
+    const VIDEO_STORE = 'clips';
+    let videoDb = null;
+
+    function openVideoDb() {
+      return new Promise((resolve, reject) => {
+        if (videoDb) return resolve(videoDb);
+        const req = indexedDB.open(VIDEO_DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(VIDEO_STORE)) {
+            db.createObjectStore(VIDEO_STORE, { keyPath: 'id', autoIncrement: true });
+          }
+        };
+        req.onsuccess = (e) => {
+          videoDb = e.target.result;
+          resolve(videoDb);
+        };
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function saveClipToDb(blob, meta = {}) {
+      return openVideoDb().then(db => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(VIDEO_STORE, 'readwrite');
+          const store = tx.objectStore(VIDEO_STORE);
+          const record = {
+            createdAt: Date.now(),
+            durationMs: meta.durationMs || 0,
+            tag: meta.tag || '',
+            blob
+          };
+          const req = store.add(record);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function getAllClipsFromDb() {
+      return openVideoDb().then(db => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(VIDEO_STORE, 'readonly');
+          const store = tx.objectStore(VIDEO_STORE);
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function renderVideoGallery() {
+      getAllClipsFromDb().then(clips => {
+        videoGalleryEl.innerHTML = '';
+        if (!clips.length) {
+          videoGalleryEl.innerHTML = '<div style="font-size:0.72rem;color:var(--text-muted);padding:4px;">No clips yet. Record a 5–20 second “I actually did it” proof.</div>';
+          btnPlayWeeklyEl.disabled = true;
+          btnRandomShareEl.disabled = true;
+          return;
+        }
+
+        btnPlayWeeklyEl.disabled = false;
+        btnRandomShareEl.disabled = !settings.autoPostPrompts;
+
+        clips.sort((a, b) => b.createdAt - a.createdAt);
+
+        clips.forEach((clip, idx) => {
+          const row = document.createElement('div');
+          row.className = 'video-item';
+
+          const meta = document.createElement('div');
+          meta.className = 'video-meta';
+          const title = document.createElement('div');
+          const date = new Date(clip.createdAt);
+          title.textContent = clip.tag || `Win clip #${clips.length - idx}`;
+          const sub = document.createElement('span');
+          const sec = clip.durationMs ? Math.round(clip.durationMs / 1000) : '—';
+          sub.textContent = `${niceDate(date)} · ~${sec}s`;
+
+          meta.appendChild(title);
+          meta.appendChild(sub);
+
+          const actions = document.createElement('div');
+          actions.className = 'task-actions';
+
+          const playBtn = document.createElement('button');
+          playBtn.type = 'button';
+          playBtn.className = 'btn btn-ghost btn-small';
+          playBtn.textContent = 'Play';
+          playBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(clip.blob);
+            videoPreviewEl.src = url;
+            videoPreviewEl.controls = true;
+            videoPreviewEl.play();
+          });
+
+          const dlBtn = document.createElement('button');
+          dlBtn.type = 'button';
+          dlBtn.className = 'btn btn-ghost btn-small';
+          dlBtn.textContent = 'Save';
+          dlBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(clip.blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (clip.tag || 'atomic-win') + '.webm';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          });
+
+          actions.appendChild(playBtn);
+          actions.appendChild(dlBtn);
+
+          row.appendChild(meta);
+          row.appendChild(actions);
+          videoGalleryEl.appendChild(row);
+        });
+      }).catch(() => {
+        videoGalleryEl.innerHTML = '<div style="font-size:0.72rem;color:var(--text-muted);padding:4px;">Video storage not available in this browser.</div>';
+        btnPlayWeeklyEl.disabled = true;
+        btnRandomShareEl.disabled = true;
+      });
+    }
+
+    function startVideoCaptureHint() {
+      showFeedback('Hit “Record win” to capture a quick proof clip.', { duration: 5000 });
+      if (btnStartRecordingEl) {
+        btnStartRecordingEl.focus();
+      }
+    }
+
+    function initVideoRecording() {
+      btnStartRecordingEl.addEventListener('click', async () => {
+        try {
+          if (!mediaStream) {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            videoPreviewEl.srcObject = mediaStream;
+            videoPreviewEl.muted = true;
+            videoPreviewEl.play();
+          }
+
+          recordedChunks = [];
+          mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm;codecs=vp9,opus' });
+          const startTime = Date.now();
+
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const durationMs = Date.now() - startTime;
+            await saveClipToDb(blob, { durationMs, tag: currentVideoTagTitle || 'Tiny win' });
+            recordedChunks = [];
+            currentVideoTagTitle = null;
+            renderVideoGallery();
+          };
+
+          mediaRecorder.start();
+          btnStartRecordingEl.disabled = true;
+          btnStopRecordingEl.disabled = false;
+          showFeedback('Recording… keep it short and real (5–20 seconds).', { duration: 5000 });
+        } catch (err) {
+          console.error(err);
+          showFeedback('Camera/mic not available. Check permissions and try again.', { duration: 6000 });
+        }
+      });
+
+      btnStopRecordingEl.addEventListener('click', () => {
+        if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+        mediaRecorder.stop();
+        btnStartRecordingEl.disabled = false;
+        btnStopRecordingEl.disabled = true;
+        showFeedback('Clip saved locally. This never leaves your device unless you upload it.', { duration: 6000 });
+      });
+
+      btnPlayWeeklyEl.addEventListener('click', async () => {
+        const clips = await getAllClipsFromDb();
+        if (!clips.length) return;
+
+        const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const recent = clips.filter(c => c.createdAt >= weekAgo);
+        const toPlay = recent.length ? recent : clips;
+
+        let idx = 0;
+        const playNext = () => {
+          if (idx >= toPlay.length) return;
+          const url = URL.createObjectURL(toPlay[idx].blob);
+          videoPreviewEl.src = url;
+          videoPreviewEl.controls = true;
+          videoPreviewEl.play();
+          videoPreviewEl.onended = () => {
+            URL.revokeObjectURL(url);
+            idx++;
+            playNext();
+          };
+        };
+        playNext();
+        showFeedback('Weekly highlight: playing your recent proof clips back-to-back.', { duration: 7000 });
+      });
+
+      btnRandomShareEl.addEventListener('click', async () => {
+        const clips = await getAllClipsFromDb();
+        if (!clips.length) return;
+        const idx = Math.floor(Math.random() * clips.length);
+        const clip = clips[idx];
+        const sharePrompts = [
+          'Share this with the caption: “Evidence that I actually do the work.”',
+          'Post this and write: “Tiny wins, daily. No hype, just receipts.”',
+          'Use this as a story with: “Not perfect, but consistent.”',
+          'Caption idea: “Proof that I keep promises to myself.”'
+        ];
+        const prompt = sharePrompts[Math.floor(Math.random() * sharePrompts.length)];
+        showFeedback(prompt, { duration: 9000 });
+        const url = URL.createObjectURL(clip.blob);
+        videoPreviewEl.src = url;
+        videoPreviewEl.controls = true;
+        videoPreviewEl.play();
+      });
+    }
+
+    /****************************************************************
+     * Accountability – buddies, leaderboard, weekly challenge
+     ****************************************************************/
+    const WEEKLY_CHALLENGES = [
+      'Log at least 1 tiny win on 5 days this week.',
+      'Record 3 proof clips of real actions.',
+      'Hit an effort score of 60+ on 3 days.',
+      'Complete all 3 micro-goals on 2 different days.',
+      'Do at least 1 Fitness and 1 Business win on the same day.'
+    ];
+
+    function recalcBuddyScores() {
+      const keys7 = getLast7DateKeys();
+      const wins7 = keys7.reduce((sum, k) => sum + getWinsForDate(k).length, 0);
+      buddies.forEach(b => {
+        // purely local: buddy effort = your effort +/- small variation
+        const base = computeEffortScore();
+        const offset = ((b.name || '').length % 11) - 5;
+        b.score = clamp(base + offset, 10, 100);
+      });
+      saveBuddies();
+    }
+
+    function renderBuddies() {
+      recalcBuddyScores();
+      buddyListEl.innerHTML = '';
+      if (!buddies.length) {
+        buddyListEl.innerHTML = '<div style="font-size:0.72rem;color:var(--text-muted);padding:4px;">Add a few names (friends, coworkers, creators) you want to “quietly compete” with.</div>';
+        return;
+      }
+
+      const sorted = buddies.slice().sort((a, b) => b.score - a.score);
+      sorted.forEach((b, idx) => {
+        const row = document.createElement('div');
+        row.className = 'buddy-row';
+
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${b.name}</strong>`;
+
+        const right = document.createElement('div');
+        const badge = document.createElement('span');
+        badge.className = 'rank-badge';
+
+        if (idx === 0) badge.classList.add('gold');
+        else if (idx === 1) badge.classList.add('silver');
+        else if (idx === 2) badge.classList.add('bronze');
+
+        badge.textContent = `Effort ${b.score}`;
+        right.appendChild(badge);
+        row.appendChild(left);
+        row.appendChild(right);
+        buddyListEl.appendChild(row);
+      });
+    }
+
+    function initBuddyControls() {
+      buddyAddBtnEl.addEventListener('click', () => {
+        const name = (buddyNameInputEl.value || '').trim();
+        if (!name) return;
+        buddies.push({ name, score: 0 });
+        buddyNameInputEl.value = '';
+        saveBuddies();
+        renderBuddies();
+      });
+    }
+
+    function initWeeklyChallenge() {
+      const currentWeekKey = (() => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const week = Math.floor(((d - new Date(year, 0, 1)) / 86400000 + d.getDay() + 1) / 7);
+        return `${year}-W${week}`;
+      })();
+
+      accountabilityMeta = accountabilityMeta || {};
+      if (accountabilityMeta.weekKey !== currentWeekKey) {
+        accountabilityMeta.weekKey = currentWeekKey;
+        const idx = Math.floor(Math.random() * WEEKLY_CHALLENGES.length);
+        accountabilityMeta.challenge = WEEKLY_CHALLENGES[idx];
+        saveAccountability();
+      }
+
+      weeklyChallengeTextEl.textContent = accountabilityMeta.challenge || WEEKLY_CHALLENGES[0];
+    }
+
+    /****************************************************************
+     * Settings init
+     ****************************************************************/
+    function initSettingsUI() {
+      settingBrutalEnabledEl.checked = settings.brutalEnabled;
+      settingBrutalLevelEl.value = settings.brutalLevel;
+      settingRemindersEnabledEl.checked = settings.remindersEnabled;
+      settingForgivenessEl.checked = settings.streakForgiveness;
       settingMaxPinnedEl.value = String(settings.maxPinned || 3);
-      settingToneEl.value = settings.tone || 'encouraging';
+      settingToneEl.value = settings.tone;
+      settingMentalHealthEl.checked = settings.mentalHealthMode;
+      settingAutoPostEl.checked = settings.autoPostPrompts;
+      settingStorageModeEl.value = settings.storageMode;
+
+      settingBrutalEnabledEl.addEventListener('change', () => {
+        settings.brutalEnabled = settingBrutalEnabledEl.checked;
+        saveSettings();
+        if (settings.brutalEnabled) {
+          showFeedback('Brutal honesty enabled. This app will stop letting you off the hook gently.', { duration: 6000 });
+        }
+        startBrutalLoop();
+      });
+
+      settingBrutalLevelEl.addEventListener('change', () => {
+        settings.brutalLevel = settingBrutalLevelEl.value;
+        saveSettings();
+      });
+
+      settingRemindersEnabledEl.addEventListener('change', () => {
+        settings.remindersEnabled = settingRemindersEnabledEl.checked;
+        saveSettings();
+        startBrutalLoop();
+      });
 
       settingForgivenessEl.addEventListener('change', () => {
         settings.streakForgiveness = settingForgivenessEl.checked;
-        saveSettings(settings);
-        showFeedbackMessage(settings.streakForgiveness
-          ? 'Streak forgiveness enabled. One-day misses hurt less. 💛'
-          : 'Streak forgiveness disabled. Missed days fully reset the run. 🔄');
+        saveSettings();
       });
 
       settingMaxPinnedEl.addEventListener('change', () => {
-        const val = Number(settingMaxPinnedEl.value) || 3;
-        settings.maxPinned = val;
-        saveSettings(settings);
-        // If too many pinned, trim
-        if (pinnedTaskIds.length > val) {
-          pinnedTaskIds = pinnedTaskIds.slice(0, val);
-          savePinned(currentTrackId, pinnedTaskIds);
-          renderFocusSection();
-          renderTasks();
-        }
-        showFeedbackMessage(`Max focus quests set to ${val}. ⭐`);
+        settings.maxPinned = Number(settingMaxPinnedEl.value || 3);
+        saveSettings();
+        renderFocusSection();
       });
 
       settingToneEl.addEventListener('change', () => {
-        settings.tone = settingToneEl.value || 'encouraging';
-        saveSettings(settings);
-        const msg = settings.tone === 'gentle'
-          ? 'Tone set to gentle. The app will talk softly to you. 🤍'
-          : settings.tone === 'hype'
-          ? 'Tone set to hype. Expect more energy. 🧨'
-          : 'Tone set to encouraging. Balanced support activated. ✨';
-        showFeedbackMessage(msg);
+        settings.tone = settingToneEl.value;
+        saveSettings();
       });
-    }
 
-    // ---------- ONBOARDING ----------
-    function updateOnboardingUI() {
-      const stepData = ONBOARDING_STEPS[onboardingStep];
-      onboardingTitleEl.textContent = stepData.title;
-      onboardingBodyEl.textContent = stepData.body;
-      onboardingListEl.innerHTML = '';
-      stepData.bullets.forEach(b => {
-        const li = document.createElement('li');
-        li.textContent = b;
-        onboardingListEl.appendChild(li);
+      settingMentalHealthEl.addEventListener('change', () => {
+        settings.mentalHealthMode = settingMentalHealthEl.checked;
+        saveSettings();
       });
-      onboardingNextBtn.textContent = stepData.button;
-      onboardingDots.forEach(dot => {
-        const stepIndex = Number(dot.getAttribute('data-step'));
-        dot.classList.toggle('active', stepIndex === onboardingStep);
+
+      settingAutoPostEl.addEventListener('change', () => {
+        settings.autoPostPrompts = settingAutoPostEl.checked;
+        saveSettings();
+        renderVideoGallery();
       });
-    }
 
-    function startOnboardingIfNeeded() {
-      if (hasOnboarded()) {
-        onboardingOverlayEl.style.display = 'none';
-        return;
-      }
-      onboardingStep = 0;
-      updateOnboardingUI();
-      onboardingOverlayEl.style.display = 'flex';
-
-      onboardingNextBtn.onclick = () => {
-        if (onboardingStep < ONBOARDING_STEPS.length - 1) {
-          onboardingStep += 1;
-          updateOnboardingUI();
-        } else {
-          setOnboarded();
-          onboardingOverlayEl.style.display = 'none';
+      settingStorageModeEl.addEventListener('change', () => {
+        settings.storageMode = settingStorageModeEl.value;
+        saveSettings();
+        if (settings.storageMode === 'manual-cloud') {
+          showFeedback('Manual cloud mode: export JSON regularly and store it wherever you trust.', { duration: 6000 });
         }
-      };
+      });
+    }
 
-      onboardingSkipBtn.onclick = () => {
-        setOnboarded();
-        onboardingOverlayEl.style.display = 'none';
+    /****************************************************************
+     * Export / import
+     ****************************************************************/
+    function buildExportPayload() {
+      return {
+        state,
+        settings,
+        brutalConfig,
+        microGoalsMap,
+        buddies,
+        accountabilityMeta,
+        currentTrackId,
+        customTasksByTrack: TRACKS.reduce((acc, t) => {
+          acc[t.id] = loadCustomTasks(t.id);
+          return acc;
+        }, {}),
+        pinnedByTrack: TRACKS.reduce((acc, t) => {
+          acc[t.id] = loadPinned(t.id);
+          return acc;
+        }, {})
       };
     }
 
-    // ---------- INIT ----------
-    (function init() {
-      ensureTodayEntry();
-      mergeTasks();
-      dateChipEl.textContent = formatNiceDate();
-      updateTrackChip();
-      renderTrackSelector();
-      updateStatsUI();
-      renderFocusSection();
+    function handleExport() {
+      const payload = buildExportPayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'atomic-wins-export.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleImport() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (data.state) state = data.state;
+            if (data.settings) settings = Object.assign({}, settings, data.settings);
+            if (data.brutalConfig) brutalConfig = Object.assign({}, brutalConfig, data.brutalConfig);
+            if (data.microGoalsMap) microGoalsMap = data.microGoalsMap;
+            if (data.buddies) buddies = data.buddies;
+            if (data.accountabilityMeta) accountabilityMeta = data.accountabilityMeta;
+            if (data.currentTrackId) currentTrackId = data.currentTrackId;
+
+            if (data.customTasksByTrack) {
+              Object.keys(data.customTasksByTrack).forEach(trackId => {
+                saveCustomTasks(trackId, data.customTasksByTrack[trackId] || []);
+              });
+            }
+            if (data.pinnedByTrack) {
+              Object.keys(data.pinnedByTrack).forEach(trackId => {
+                savePinned(trackId, data.pinnedByTrack[trackId] || []);
+              });
+            }
+
+            saveState();
+            saveSettings();
+            saveBrutal();
+            saveMicroGoals();
+            saveBuddies();
+            saveAccountability();
+
+            customTasks = loadCustomTasks(currentTrackId);
+            pinnedTaskIds = loadPinned(currentTrackId);
+            taskList = buildTaskListForTrack(currentTrackId);
+
+            renderTracks();
+            renderTasks();
+            renderFocusSection();
+            renderMicroGoals();
+            updateStatsUI();
+            updateHistoryUI();
+            updateAnalytics();
+            renderVideoGallery();
+            renderBuddies();
+            initWeeklyChallenge();
+            showFeedback('Import complete. Your Atomic Wins profile has been restored.', { duration: 6000 });
+          } catch (err) {
+            console.error(err);
+            showFeedback('Import failed. Check that you selected a valid Atomic Wins JSON file.', { duration: 7000 });
+          }
+        };
+        reader.readAsText(file);
+      });
+      input.click();
+    }
+
+    /****************************************************************
+     * Reset all
+     ****************************************************************/
+    function initReset() {
+      resetButtonEl.addEventListener('click', () => {
+        if (!confirm('This will reset your streak, settings, micro-goals, and tasks for this device only. Continue?')) return;
+        localStorage.clear();
+        indexedDB.deleteDatabase(VIDEO_DB_NAME);
+        location.reload();
+      });
+    }
+
+    /****************************************************************
+     * PWA manifest + service worker
+     ****************************************************************/
+    function initPWA() {
+      try {
+        const manifest = {
+          name: 'Atomic Wins – Brutal Accountability',
+          short_name: 'Atomic Wins',
+          start_url: '.',
+          display: 'standalone',
+          background_color: '#020617',
+          theme_color: '#22c55e',
+          icons: []
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.getElementById('dynamicManifest');
+        if (link) link.href = url;
+
+        if ('serviceWorker' in navigator) {
+          const swCode = `
+            const CACHE_NAME = 'atomic-wins-cache-v1';
+            const OFFLINE_URLS = ['.'];
+
+            self.addEventListener('install', event => {
+              event.waitUntil(
+                caches.open(CACHE_NAME).then(cache => cache.addAll(OFFLINE_URLS))
+              );
+              self.skipWaiting();
+            });
+
+            self.addEventListener('activate', event => {
+              event.waitUntil(
+                caches.keys().then(keys =>
+                  Promise.all(keys.map(k => k !== CACHE_NAME && caches.delete(k)))
+                )
+              );
+              self.clients.claim();
+            });
+
+            self.addEventListener('fetch', event => {
+              if (event.request.method !== 'GET') return;
+              event.respondWith(
+                caches.match(event.request).then(resp => resp || fetch(event.request).catch(() => caches.match('.')))
+              );
+            });
+          `;
+          const swBlob = new Blob([swCode], { type: 'text/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {});
+        }
+      } catch (err) {
+        console.warn('PWA setup error', err);
+      }
+    }
+
+    /****************************************************************
+     * Main init
+     ****************************************************************/
+    function initApp() {
+      ensureStateConsistency();
+      initTheme();
+      renderTracks();
+      taskList = buildTaskListForTrack(currentTrackId);
       renderTasks();
-      attachResetHandler();
-      attachCustomTaskHandler();
-      attachReflectionHandler();
-      populateReflection();
-      attachSettingsHandler();
-      startOnboardingIfNeeded();
-    })();
+      renderFocusSection();
+
+      renderMicroGoals();
+      updateStatsUI();
+      updateHistoryUI();
+      updateAnalytics();
+      renderVideoGallery();
+      renderBuddies();
+      initWeeklyChallenge();
+      initCustomTaskControls();
+      initReflection();
+      initSettingsUI();
+      initVideoRecording();
+      initReset();
+      initPWA();
+
+      historyViewToggleEl.addEventListener('click', toggleHistoryView);
+
+      document.getElementById('btnExportState').addEventListener('click', handleExport);
+      document.getElementById('btnImportState').addEventListener('click', handleImport);
+
+      buddyNameInputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          buddyAddBtnEl.click();
+        }
+      });
+
+      maybeShowOnboarding();
+      startBrutalLoop();
+    }
+
+    // Kick it off once DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
   </script>
 </body>
 </html>
